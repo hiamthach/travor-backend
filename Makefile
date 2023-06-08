@@ -4,7 +4,7 @@ server:
 	go run main.go
 
 postgres:
-	docker run --name travor-backend --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123456 -d postgres:12-alpine
+	docker run --name travor-backend -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123456 -d postgres:12-alpine
 
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
