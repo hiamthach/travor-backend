@@ -1,0 +1,121 @@
+Project GolangUdemyBackend {
+  database_type: 'PostgreSQL'
+  Note: '''
+    Travor Backend Code
+  '''
+}
+
+Table users as U {
+  username varchar [pk]
+  hashed_password varchar [not null]
+  full_name varchar [not null]
+  email varchar [unique, not null]
+  phone varchar [not null]
+  password_changed_at timestamptz [not null, default: '0001-01-01 00:00:00Z']
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table destinations as Des {
+  id serial [pk, increment]
+  name varchar [not null]
+  description varchar [not null]
+  price int [not null]
+  country varchar [not null]
+  visa_require varchar
+  language varchar
+  currency varchar
+  area varchar
+  location varchar 
+
+  Indexes {
+    id
+    name
+  }
+}
+
+Table galleries as G {
+  id bigserial [pk, increment]
+  des_id int [not null, ref: > Des.id]
+  url varchar [not null]
+  Indexes {
+    des_id
+  }
+}
+
+Table types as T {
+  id serial [pk, increment]
+  name varchar [not null]
+}
+
+Table packages as P {
+  id serial [pk, increment]
+  des_id int [not null, ref: > Des.id]
+  name varchar [not null]
+  details varchar [not null]
+  price bigint [not null]
+  img_url varchar [not null]
+  duration varchar [not null]
+  number_people int [not null]
+
+  Indexes {
+    id
+    name
+  }
+}
+
+Table packages_types as PT {
+  p_id int [pk, ref: > P.id]
+  t_id int [pk, ref: > T.id]
+
+  Indexes {
+    (p_id, t_id) [unique]
+  }
+}
+
+Table plans {
+  id bigserial [pk, increment]
+  p_id int [not null, ref: > P.id]
+  order smallint [not null]
+  name varchar [not null]
+  description varchar [not null]
+
+  Indexes {
+    (p_id, order) [unique]
+  }
+}
+
+Table trips {
+  id bigserial [pk, increment]
+  user varchar [not null, ref: > U.username]
+  p_id int [not null, ref: > P.id]
+  total bigint [not null]
+  start_date timestamptz [not null, default: `now()`]
+  notes varchar 
+
+  Indexes {
+    user
+    (user, p_id)
+  }
+}
+
+Table blogs {
+  id serial [pk, increment]
+  author varchar [not null, ref: > U.username]
+  destination_id int [ref: > Des.id]
+  title varchar [not null]
+  description varchar [not null]
+  details varchar [not null]
+  tags varchar
+  facebook varchar
+  instagram varchar
+  twitter varchar
+  img_url varchar [not null]
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table reviews {
+  id serial [pk, increment]
+  author varchar [not null, ref: > U.username]
+  rate float [not null]
+  detail varchar
+}

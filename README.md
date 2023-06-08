@@ -1,2 +1,2 @@
-# travor-backend
+# Travor Backend
 Backend code for Travor application
