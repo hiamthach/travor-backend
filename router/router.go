@@ -2,16 +2,17 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/travor-backend/config"
 	"github.com/travor-backend/db"
+	"github.com/travor-backend/middleware"
+	"github.com/travor-backend/util"
 )
 
 type Server struct {
-	config config.Config
+	config util.Config
 	router *gin.Engine
 }
 
-func NewServer(config config.Config) (*Server, error) {
+func NewServer(config util.Config) (*Server, error) {
 	server := &Server{config: config}
 
 	_, err := db.GetInstance(config.DBSource)
@@ -25,6 +26,7 @@ func NewServer(config config.Config) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+	router.Use(middleware.CorsMiddleware())
 
 	api := router.Group("/api/v1")
 
