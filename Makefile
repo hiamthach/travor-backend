@@ -1,5 +1,8 @@
 DB_URL=postgresql://root:123456@localhost:5432/travor-backend?sslmode=disable
 
+dev:
+	air
+
 server:
 	go run main.go
 
@@ -15,4 +18,4 @@ migratedown:
 init-migrate:
 	migrate create -ext sql -dir db/migration -seq
 
-.PHONY: server migrateup migratedown init-migrate postgres
+.PHONY: dev server migrateup migratedown init-migrate postgres

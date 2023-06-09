@@ -12,3 +12,7 @@ type Destination struct {
 	Area        string `json:"area" gorm:"area"`
 	Location    string `json:"location" gorm:"location"`
 }
+
+func (*Destination) TableName() string {
+	return "destinations"
+}
