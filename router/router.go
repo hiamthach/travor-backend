@@ -30,6 +30,7 @@ func (server *Server) setupRouter() {
 
 	{
 		destinationRoutes(api)
+		packagesRoutes(api)
 	}
 
 	server.router = router
