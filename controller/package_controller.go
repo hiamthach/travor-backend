@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/travor-backend/dto"
+	"github.com/travor-backend/model"
 	"github.com/travor-backend/util"
 	"gorm.io/gorm"
 )
@@ -61,29 +62,47 @@ func GetPackageById(db *gorm.DB) gin.HandlerFunc {
 // CreatePackage
 func CreatePackage(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var packageModel dto.PackageRequestBody
-		err := ctx.ShouldBindJSON(&packageModel)
-
-		if err != nil {
+		var body dto.PackageRequestBody
+		if err := ctx.ShouldBindJSON(&body); err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
 
-		err = db.Create(&packageModel).Error
+		// Map the request body to the model
+		packageCreated := model.Package{
+			Name:         body.Name,
+			Details:      body.Details,
+			Price:        body.Price,
+			DesID:        body.DesID,
+			ImgURL:       body.ImgURL,
+			Duration:     body.Duration,
+			NumberPeople: body.NumberPeople,
+		}
 
-		if err != nil {
+		if err := db.Create(&packageCreated).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, packageModel)
+		// Loop through the types and create the package type
+		for _, typ := range body.Types {
+			if err := db.Create(&model.PackageType{
+				PID: packageCreated.ID,
+				TID: typ.ID,
+			}).Error; err != nil {
+				ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+				return
+			}
+		}
+
+		ctx.JSON(http.StatusCreated, packageCreated)
 	}
 }
 
 // UpdatePackage
 func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var packageModel dto.PackageRequestBody
+		var body dto.PackageRequestBody
 		idStr := ctx.Param("id")
 		id, err := strconv.ParseUint(idStr, 10, 64)
 		if err != nil {
@@ -91,29 +110,52 @@ func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		err = ctx.ShouldBindJSON(&packageModel)
-
-		packageModel.ID = id
-		if err != nil {
+		body.ID = id
+		if err = ctx.ShouldBindJSON(&body); err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
 
-		result := db.Model(&dto.PackageRequestBody{}).Where("id = ?", id).Updates(&packageModel)
-
-		if result.Error != nil {
-			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
-			return
-		}
-
-		// Check if no rows were affected
-		if result.RowsAffected == 0 {
-			err := gorm.ErrRecordNotFound
+		var packageUpdated model.Package
+		if err := db.First(&packageUpdated, id).Error; err != nil {
 			ctx.JSON(http.StatusNotFound, util.ErrorResponse(err))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, packageModel)
+		packageUpdated = model.Package{
+			ID:           body.ID,
+			Name:         body.Name,
+			Details:      body.Details,
+			Price:        body.Price,
+			DesID:        body.DesID,
+			ImgURL:       body.ImgURL,
+			Duration:     body.Duration,
+			NumberPeople: body.NumberPeople,
+		}
+
+		if err := db.Save(&packageUpdated).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		// Delete all existing package types associated with the package
+		if err := db.Delete(model.PackageType{}, "p_id = ?", packageUpdated.ID).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		// Create and save the new package types
+		for _, typ := range body.Types {
+			if err := db.Create(&model.PackageType{
+				PID: packageUpdated.ID,
+				TID: typ.ID,
+			}).Error; err != nil {
+				ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+				return
+			}
+		}
+
+		ctx.JSON(http.StatusOK, body)
 	}
 }
 

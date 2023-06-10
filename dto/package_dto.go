@@ -36,5 +36,8 @@ type PackageRequestBody struct {
 	ImgURL       string `json:"img_url"`
 	Duration     string `json:"duration"`
 	NumberPeople int    `json:"number_people"`
+	Types        []struct {
+		ID uint64 `json:"id"`
+	} `json:"types"`
 	PackageTable
 }
