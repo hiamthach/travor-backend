@@ -33,6 +33,7 @@ func (server *Server) setupRouter() {
 	{
 		destinationRoutes(api)
 		packagesRoutes(api)
+		typesRoutes(api)
 	}
 
 	server.router = router
