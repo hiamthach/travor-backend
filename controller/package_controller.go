@@ -23,7 +23,7 @@ func GetPackages(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// Load the destination data from the database
-		err := db.Preload("Destination").Limit(params.PageSize).Offset(params.PageSize * (params.Page - 1)).Find(&response.Data).Error
+		err := db.Preload("Types").Preload("Destination").Limit(params.PageSize).Offset(params.PageSize * (params.Page - 1)).Find(&response.Data).Error
 
 		db.Table("packages").Count(&response.Total)
 		response.CurrentPage = params.Page
@@ -43,7 +43,7 @@ func GetPackageById(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var packageModel dto.PackageDto
 		id := ctx.Param("id")
-		err := db.Preload("Destination").First(&packageModel, id).Error
+		err := db.Preload("Types").Preload("Destination").First(&packageModel, id).Error
 
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
@@ -167,6 +167,11 @@ func DeletePackage(db *gorm.DB) gin.HandlerFunc {
 		id, err := strconv.ParseUint(idStr, 10, 64)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+			return
+		}
+
+		if err := db.Delete(model.PackageType{}, "p_id = ?", id).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
 		}
 

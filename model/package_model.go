@@ -2,7 +2,7 @@ package model
 
 // Package struct
 type Package struct {
-	ID           uint64 `json:"id" gorm:"id"`
+	ID           uint64 `json:"id" gorm:"primaryKey"`
 	DesID        uint64 `json:"des_id" gorm:"des_id"`
 	Name         string `json:"name" gorm:"name"`
 	Details      string `json:"details" gorm:"details"`
@@ -10,6 +10,7 @@ type Package struct {
 	ImgURL       string `json:"img_url" gorm:"img_url"`
 	Duration     string `json:"duration" gorm:"duration"`
 	NumberPeople int    `json:"number_people" gorm:"number_people"`
+	Types        []Type `gorm:"many2many:packages_types;joinForeignKey:PID;JoinReferences:TID" json:"types"`
 }
 
 // TableName for package
