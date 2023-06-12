@@ -12,26 +12,21 @@ import (
 )
 
 // This function retrieves a list of destinations from a database based on pagination params a
-func GetDestinations(db *gorm.DB) func(ctx *gin.Context) {
+func GetDestinations(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var response dto.DestinationsAllResponse
-		var requestParams dto.DestinationRequestParam
-		if err := ctx.ShouldBindQuery(&requestParams); err != nil {
+		var params dto.DestinationRequestParam
+		if err := ctx.ShouldBindQuery(&params); err != nil {
 			// Handle the error, if any
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
 
-		err := db.Limit(requestParams.PageSize).Offset(requestParams.PageSize * (requestParams.Page - 1)).Find(&response.Data)
+		err := db.Limit(params.PageSize).Offset(params.PageSize * (params.Page - 1)).Find(&response.Data)
 		db.Table("destinations").Count(&response.Total)
-		response.CurrentPage = requestParams.Page
-		response.PageSize = requestParams.PageSize
+		response.CurrentPage = params.Page
+		response.PageSize = params.PageSize
 		if err.Error != nil {
-			if err.Error == gorm.ErrRecordNotFound {
-				ctx.JSON(http.StatusNotFound, util.ErrorResponse(err.Error))
-				return
-			}
-
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err.Error))
 			return
 		}
@@ -40,7 +35,7 @@ func GetDestinations(db *gorm.DB) func(ctx *gin.Context) {
 }
 
 // This function retrieves a destination by its ID from a database and returns it as a JSON response.
-func GetDestinationById(db *gorm.DB) func(ctx *gin.Context) {
+func GetDestinationById(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var destination model.Destination
 		id := ctx.Param("id")
@@ -59,7 +54,7 @@ func GetDestinationById(db *gorm.DB) func(ctx *gin.Context) {
 }
 
 // This function creates a destination in a database and returns it as a JSON response.
-func CreateDestination(db *gorm.DB) func(ctx *gin.Context) {
+func CreateDestination(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var destination dto.DestinationRequestBody
 		err := ctx.ShouldBindJSON(&destination)
@@ -77,7 +72,7 @@ func CreateDestination(db *gorm.DB) func(ctx *gin.Context) {
 }
 
 // This function updates a destination in a database and returns it as a JSON response.
-func UpdateDestination(db *gorm.DB) func(ctx *gin.Context) {
+func UpdateDestination(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var destination dto.DestinationRequestBody
 		idStr := ctx.Param("id")
@@ -110,7 +105,7 @@ func UpdateDestination(db *gorm.DB) func(ctx *gin.Context) {
 }
 
 // This function deletes a destination in a database and returns it as a JSON response.
-func DeleteDestination(db *gorm.DB) func(ctx *gin.Context) {
+func DeleteDestination(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		result := db.Delete(&model.Destination{}, id)

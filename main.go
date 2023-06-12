@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	"github.com/travor-backend/config"
 	"github.com/travor-backend/router"
+	"github.com/travor-backend/util"
 )
 
 func main() {
-	config, err := config.LoadConfig(".")
+	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("Can not load config: ", err)
 	}
