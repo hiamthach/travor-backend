@@ -20,6 +20,11 @@ func NewServer(config util.Config) (*Server, error) {
 		return nil, err
 	}
 
+	err = db.InitializeFirebase()
+	if err != nil {
+		return nil, err
+	}
+
 	server.setupRouter()
 	return server, nil
 }
@@ -34,6 +39,7 @@ func (server *Server) setupRouter() {
 		destinationRoutes(api)
 		packagesRoutes(api)
 		typesRoutes(api)
+		galleryRoutes(api)
 	}
 
 	server.router = router
