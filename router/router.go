@@ -30,16 +30,18 @@ func NewServer(config util.Config) (*Server, error) {
 }
 
 func (server *Server) setupRouter() {
-	router := gin.Default()
+	router := gin.New()
 	router.Use(middleware.CorsMiddleware())
 
 	api := router.Group("/api/v1")
 
 	{
 		destinationRoutes(api)
-		packagesRoutes(api)
-		typesRoutes(api)
+		packageRoutes(api)
+		typeRoutes(api)
 		galleryRoutes(api)
+		userRoutes(api)
+		tripRoutes(api)
 	}
 
 	server.router = router

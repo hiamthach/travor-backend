@@ -6,7 +6,7 @@ import (
 	"github.com/travor-backend/db"
 )
 
-func packagesRoutes(router *gin.RouterGroup) {
+func packageRoutes(router *gin.RouterGroup) {
 	packages := router.Group("/packages")
 
 	{
