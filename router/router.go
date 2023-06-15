@@ -41,6 +41,7 @@ func (server *Server) setupRouter() {
 		typeRoutes(api)
 		galleryRoutes(api)
 		userRoutes(api)
+		tripRoutes(api)
 	}
 
 	server.router = router

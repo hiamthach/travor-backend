@@ -18,6 +18,7 @@ func GetGalleriesByDesID(db *gorm.DB) gin.HandlerFunc {
 		var galleries []model.Gallery
 		if err := db.Where("des_id = ?", desID).Find(&galleries).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
 		}
 
 		ctx.JSON(http.StatusOK, util.SuccessResponse("Get galleries successfully", galleries))
@@ -29,17 +30,20 @@ func UploadToGallery(db *gorm.DB) gin.HandlerFunc {
 		file, err := ctx.FormFile("image")
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+			return
 		}
 		desIDStr := ctx.Param("des")
 		desID, err := strconv.ParseUint(desIDStr, 10, 64)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+			return
 		}
 		var gallery model.Gallery
 
 		url, err := util.UploadFile(file, ctx)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+			return
 		}
 
 		gallery.DesID = desID
@@ -47,6 +51,7 @@ func UploadToGallery(db *gorm.DB) gin.HandlerFunc {
 
 		if err = db.Create(&gallery).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
 		}
 
 		ctx.JSON(http.StatusOK, util.SuccessResponse("Upload image successfully", gallery))
@@ -65,6 +70,7 @@ func DeleteGallery(db *gorm.DB) gin.HandlerFunc {
 		var gallery model.Gallery
 		if err := db.Where("id = ?", id).Delete(&gallery).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
 		}
 		ctx.JSON(http.StatusOK, util.SuccessResponse("Delete gallery successfully", nil))
 	}
