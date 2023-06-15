@@ -37,3 +37,8 @@ type CreateUserParams struct {
 	HashedPassword string `json:"hashed_password" binding:"required"`
 	UserTable
 }
+
+type UpdateUserInfo struct {
+	Phone    string `json:"phone"`
+	FullName string `json:"full_name"`
+}

@@ -72,3 +72,23 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 		ctx.JSON(http.StatusOK, body)
 	}
 }
+
+func UpdateUserInfo(db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var body dto.UpdateUserInfo
+		username := ctx.Param("username")
+		var user dto.UserDto
+
+		if err := ctx.ShouldBindJSON(&body); err != nil {
+			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+			return
+		}
+
+		if err := db.Model(&user).Where("username = ?", username).Updates(body).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusOK, util.SuccessResponse("Update user info successfully", nil))
+	}
+}
