@@ -2,6 +2,8 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/travor-backend/db"
 	"github.com/travor-backend/middleware"
 	"github.com/travor-backend/util"
@@ -32,6 +34,7 @@ func NewServer(config util.Config) (*Server, error) {
 func (server *Server) setupRouter() {
 	router := gin.New()
 	router.Use(middleware.CorsMiddleware())
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := router.Group("/api/v1")
 
