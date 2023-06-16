@@ -13,15 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type ErrorResponse struct {
-	Error interface{} `json:"error"`
-}
-
-type SuccessResponse struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
 // @Summary Get destinations
 // @Description Retrieves a list of destinations
 // @Tags Destinations
@@ -30,8 +21,8 @@ type SuccessResponse struct {
 // @Param page query int false "Page number"
 // @Param page_size query int false "Page size"
 // @Success 200 {object} dto.DestinationsAllResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
 // @Router /destinations [get]
 func GetDestinations(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -62,8 +53,8 @@ func GetDestinations(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param id path int true "Destination ID"
 // @Success 200 {object} model.Destination
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
 // @Router /destinations/{id} [get]
 func GetDestinationById(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -90,9 +81,9 @@ func GetDestinationById(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param body body dto.DestinationRequestBody true "Destination object to create"
 // @Success 201 {object} dto.DestinationRequestBody
-// @Failure 400 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /destinations [put]
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /destinations [post]
 func CreateDestination(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var destination dto.DestinationRequestBody
@@ -118,10 +109,10 @@ func CreateDestination(db *gorm.DB) gin.HandlerFunc {
 // @Param id path int true "Destination ID"
 // @Param destination body dto.DestinationRequestBody true "Updated destination object"
 // @Success 200 {object} dto.DestinationRequestBody
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /destinations/{id} [post]
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /destinations/{id} [put]
 func UpdateDestination(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var destination dto.DestinationRequestBody
@@ -160,9 +151,9 @@ func UpdateDestination(db *gorm.DB) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param id path int true "Destination ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 404 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
 // @Router /destinations/{id} [delete]
 func DeleteDestination(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {

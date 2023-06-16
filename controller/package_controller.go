@@ -5,13 +5,25 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/swaggo/gin-swagger"
+	_ "github.com/travor-backend/docs"
 	"github.com/travor-backend/dto"
 	"github.com/travor-backend/model"
 	"github.com/travor-backend/util"
 	"gorm.io/gorm"
 )
 
-// GetPackages
+// @Summary Get packages
+// @Description Retrieves a list of packages
+// @Tags Packages
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number"
+// @Param page_size query int false "Page size"
+// @Success 200 {array} dto.PackagesAllResponse
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /packages [get]
 func GetPackages(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var response dto.PackagesAllResponse
@@ -38,7 +50,16 @@ func GetPackages(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-// GetPackageById
+// @Summary Get a package by ID
+// @Description Retrieves a package based on the provided ID
+// @Tags Packages
+// @Accept json
+// @Produce json
+// @Param id path int true "Package ID"
+// @Success 200 {object} dto.PackageDto
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /packages/{id} [get]
 func GetPackageById(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var packageModel dto.PackageDto
@@ -59,7 +80,16 @@ func GetPackageById(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-// CreatePackage
+// @Summary Create a package
+// @Description Creates a new package
+// @Tags Packages
+// @Accept json
+// @Produce json
+// @Param body body dto.PackageRequestBody true "Package object to create"
+// @Success 201 {object} model.Package
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /packages [post]
 func CreatePackage(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body dto.PackageRequestBody
@@ -99,7 +129,18 @@ func CreatePackage(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-// UpdatePackage
+// @Summary Update a package
+// @Description Updates an existing package
+// @Tags Packages
+// @Accept json
+// @Produce json
+// @Param id path int true "Package ID"
+// @Param body body dto.PackageRequestBody true "Updated package object"
+// @Success 200 {object} dto.PackageRequestBody
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /packages/{id} [put]
 func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body dto.PackageRequestBody
@@ -159,7 +200,16 @@ func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-// DeletePackage
+// @Summary Delete a package
+// @Description Deletes a package by ID
+// @Tags Packages
+// @Accept json
+// @Produce json
+// @Param id path int true "Package ID"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /packages/{id} [delete]
 func DeletePackage(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var packageModel dto.PackageDto

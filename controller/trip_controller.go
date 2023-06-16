@@ -4,11 +4,20 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/swaggo/gin-swagger"
+	_ "github.com/travor-backend/docs"
 	"github.com/travor-backend/dto"
 	"github.com/travor-backend/util"
 	"gorm.io/gorm"
 )
 
+// @Summary Get trips
+// @Description Retrieves a list of trips
+// @Tags Trips
+// @Produce json
+// @Success 200 {array} dto.TripDto
+// @Failure 404 {object} model.ErrorResponse
+// @Router /trips [get]
 func GetTrips(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var response []dto.TripDto
@@ -22,6 +31,14 @@ func GetTrips(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get trip by ID
+// @Description Retrieves a trip by its ID
+// @Tags Trips
+// @Produce json
+// @Param id path int true "Trip ID"
+// @Success 200 {object} dto.TripDto
+// @Failure 404 {object} model.ErrorResponse
+// @Router /trips/{id} [get]
 func GetTripById(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var response dto.TripDto
@@ -39,6 +56,15 @@ func GetTripById(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Create a new trip
+// @Description Creates a new trip
+// @Tags Trips
+// @Accept json
+// @Produce json
+// @Param body body dto.TripDtoBody true "Trip object to be created"
+// @Success 200 {object} dto.TripDto
+// @Failure 500 {object} model.ErrorResponse
+// @Router /trips [post]
 func CreateTrip(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body dto.TripDtoBody
@@ -63,6 +89,17 @@ func CreateTrip(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Update a trip
+// @Description Updates an existing trip
+// @Tags Trips
+// @Accept json
+// @Produce json
+// @Param id path string true "Trip ID"
+// @Param body body dto.TripDtoUpdate true "Updated trip object"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /trips/{id} [put]
 func UpdateTrip(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body dto.TripDtoUpdate
@@ -102,6 +139,16 @@ func UpdateTrip(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Delete a trip
+// @Description Deletes a trip by ID
+// @Tags Trips
+// @Accept json
+// @Produce json
+// @Param id path string true "Trip ID"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /trips/{id} [delete]
 func DeleteTrip(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		idStr := ctx.Param("id")
