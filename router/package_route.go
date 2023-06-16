@@ -12,8 +12,8 @@ func packageRoutes(router *gin.RouterGroup) {
 	{
 		packages.GET("/", controller.GetPackages(db.DB))
 		packages.GET("/:id", controller.GetPackageById(db.DB))
-		packages.PUT("/", controller.CreatePackage(db.DB))
-		packages.POST("/:id", controller.UpdatePackage(db.DB))
+		packages.POST("/", controller.CreatePackage(db.DB))
+		packages.PUT("/:id", controller.UpdatePackage(db.DB))
 		packages.DELETE("/:id", controller.DeletePackage(db.DB))
 	}
 }

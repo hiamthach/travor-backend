@@ -2,6 +2,8 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/travor-backend/db"
 	"github.com/travor-backend/middleware"
 	"github.com/travor-backend/util"
@@ -43,6 +45,8 @@ func (server *Server) setupRouter() {
 		userRoutes(api)
 		tripRoutes(api)
 	}
+
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	server.router = router
 }

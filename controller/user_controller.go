@@ -4,11 +4,20 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/swaggo/gin-swagger"
+	_ "github.com/travor-backend/docs"
 	"github.com/travor-backend/dto"
 	"github.com/travor-backend/util"
 	"gorm.io/gorm"
 )
 
+// @Summary Get all users
+// @Description Retrieves a list of all users
+// @Tags Users
+// @Produce json
+// @Success 200 {array} dto.UserDto
+// @Failure 500 {object} model.ErrorResponse
+// @Router /users [get]
 func GetUsers(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var users []dto.UserDto
@@ -22,6 +31,14 @@ func GetUsers(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Get user by username
+// @Description Retrieves a user by their username
+// @Tags Users
+// @Produce json
+// @Param username path string true "Username of the user to retrieve"
+// @Success 200 {object} dto.UserDto
+// @Failure 404 {object} model.ErrorResponse
+// @Router /users/{username} [get]
 func GetUserByUsername(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var user dto.UserDto
@@ -42,6 +59,15 @@ func GetUserByUsername(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Create user
+// @Description Creates a new user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body dto.UserRegisterReq true "User registration details"
+// @Success 200 {object} dto.UserRegisterReq
+// @Failure 400 {object} model.ErrorResponse
+// @Router /users [post]
 func CreateUser(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body dto.UserRegisterReq
@@ -73,6 +99,16 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Update user info
+// @Description Updates the information of a user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param username path string true "Username"
+// @Param user body dto.UpdateUserInfo true "Updated user information"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 400 {object} model.ErrorResponse
+// @Router /users/{username} [put]
 func UpdateUserInfo(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var body dto.UpdateUserInfo

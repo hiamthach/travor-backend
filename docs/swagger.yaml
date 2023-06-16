@@ -1,0 +1,1066 @@
+basePath: /api/v1
+definitions:
+  dto.DestinationRequestBody:
+    properties:
+      area:
+        type: string
+      country:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      language:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      visa_require:
+        type: string
+    required:
+    - country
+    - description
+    - name
+    - price
+    type: object
+  dto.DestinationsAllResponse:
+    properties:
+      current_page:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/model.Destination'
+        type: array
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  dto.PackageDto:
+    properties:
+      des_id:
+        type: integer
+      destination:
+        $ref: '#/definitions/model.Destination'
+      details:
+        type: string
+      duration:
+        type: string
+      id:
+        type: integer
+      img_url:
+        type: string
+      name:
+        type: string
+      number_people:
+        type: integer
+      price:
+        type: integer
+      types:
+        items:
+          $ref: '#/definitions/model.Type'
+        type: array
+    type: object
+  dto.PackageRequestBody:
+    properties:
+      des_id:
+        type: integer
+      details:
+        type: string
+      duration:
+        type: string
+      id:
+        type: integer
+      img_url:
+        type: string
+      name:
+        type: string
+      number_people:
+        type: integer
+      price:
+        type: integer
+      types:
+        items:
+          properties:
+            id:
+              type: integer
+          type: object
+        type: array
+    required:
+    - des_id
+    - details
+    - name
+    - price
+    type: object
+  dto.PackagesAllResponse:
+    properties:
+      current_page:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/dto.PackageDto'
+        type: array
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  dto.TripDto:
+    properties:
+      id:
+        type: integer
+      notes:
+        type: string
+      p_id:
+        type: integer
+      start_date:
+        type: string
+      total:
+        type: integer
+      user:
+        type: string
+    required:
+    - p_id
+    - start_date
+    - total
+    - user
+    type: object
+  dto.TripDtoBody:
+    properties:
+      notes:
+        type: string
+      p_id:
+        type: integer
+      start_date:
+        type: string
+      total:
+        type: integer
+      user:
+        type: string
+    required:
+    - p_id
+    - start_date
+    - total
+    - user
+    type: object
+  dto.TripDtoUpdate:
+    properties:
+      notes:
+        type: string
+      start_date:
+        type: string
+      total:
+        type: integer
+    type: object
+  dto.TypeDto:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  dto.UpdateUserInfo:
+    properties:
+      full_name:
+        type: string
+      phone:
+        type: string
+    type: object
+  dto.UserDto:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      password_changed_at:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.UserRegisterReq:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - full_name
+    - password
+    - phone
+    - username
+    type: object
+  model.Destination:
+    properties:
+      area:
+        type: string
+      country:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      language:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      visa_require:
+        type: string
+    type: object
+  model.ErrorResponse:
+    properties:
+      error: {}
+    type: object
+  model.Gallery:
+    properties:
+      des_id:
+        type: integer
+      id:
+        type: integer
+      url:
+        type: string
+    type: object
+  model.Package:
+    properties:
+      des_id:
+        type: integer
+      details:
+        type: string
+      duration:
+        type: string
+      id:
+        type: integer
+      img_url:
+        type: string
+      name:
+        type: string
+      number_people:
+        type: integer
+      price:
+        type: integer
+      types:
+        items:
+          $ref: '#/definitions/model.Type'
+        type: array
+    type: object
+  model.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  model.Type:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      packages:
+        items:
+          $ref: '#/definitions/model.Package'
+        type: array
+    type: object
+host: localhost:8088
+info:
+  contact: {}
+  title: Travor Backend API
+  version: "1.0"
+paths:
+  /destinations:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of destinations
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DestinationsAllResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get destinations
+      tags:
+      - Destinations
+    post:
+      consumes:
+      - application/json
+      description: Creates a new destination
+      parameters:
+      - description: Destination object to create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DestinationRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.DestinationRequestBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create a destination
+      tags:
+      - Destinations
+  /destinations/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a destination by ID
+      parameters:
+      - description: Destination ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete a destination
+      tags:
+      - Destinations
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a destination based on the provided ID
+      parameters:
+      - description: Destination ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Destination'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get a destination by ID
+      tags:
+      - Destinations
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing destination
+      parameters:
+      - description: Destination ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated destination object
+        in: body
+        name: destination
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DestinationRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DestinationRequestBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update a destination
+      tags:
+      - Destinations
+  /galleries/{des}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of galleries based on the provided destination
+        ID
+      parameters:
+      - description: Destination ID
+        in: path
+        name: des
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Gallery'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get galleries by destination ID
+      tags:
+      - Galleries
+  /galleries/{des}/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads an image to the gallery of a specific destination
+      parameters:
+      - description: Destination ID
+        in: path
+        name: des
+        required: true
+        type: integer
+      - description: Image file to upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Gallery'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Upload image to gallery
+      tags:
+      - Galleries
+  /galleries/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a gallery by ID
+      parameters:
+      - description: Gallery ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete a gallery
+      tags:
+      - Galleries
+  /packages:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of packages
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.PackagesAllResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get packages
+      tags:
+      - Packages
+    post:
+      consumes:
+      - application/json
+      description: Creates a new package
+      parameters:
+      - description: Package object to create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PackageRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Package'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create a package
+      tags:
+      - Packages
+  /packages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a package by ID
+      parameters:
+      - description: Package ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete a package
+      tags:
+      - Packages
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a package based on the provided ID
+      parameters:
+      - description: Package ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PackageDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get a package by ID
+      tags:
+      - Packages
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing package
+      parameters:
+      - description: Package ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated package object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PackageRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PackageRequestBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update a package
+      tags:
+      - Packages
+  /trips:
+    get:
+      description: Retrieves a list of trips
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.TripDto'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get trips
+      tags:
+      - Trips
+    post:
+      consumes:
+      - application/json
+      description: Creates a new trip
+      parameters:
+      - description: Trip object to be created
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TripDtoBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TripDto'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create a new trip
+      tags:
+      - Trips
+  /trips/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a trip by ID
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete a trip
+      tags:
+      - Trips
+    get:
+      description: Retrieves a trip by its ID
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TripDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get trip by ID
+      tags:
+      - Trips
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing trip
+      parameters:
+      - description: Trip ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated trip object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TripDtoUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update a trip
+      tags:
+      - Trips
+  /types:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Type'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get types
+      tags:
+      - Types
+    post:
+      consumes:
+      - application/json
+      description: Creates a new type
+      parameters:
+      - description: Type object to create
+        in: body
+        name: type_
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TypeDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TypeDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create new type
+      tags:
+      - Types
+  /types/{id}:
+    delete:
+      description: Deletes a type by ID
+      parameters:
+      - description: Type ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete type by ID
+      tags:
+      - Types
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a type by its ID
+      parameters:
+      - description: Type ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Type'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get type by ID
+      tags:
+      - Types
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing type by ID
+      parameters:
+      - description: Type ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Type object to update
+        in: body
+        name: type_
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TypeDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update type by ID
+      tags:
+      - Types
+  /users:
+    get:
+      description: Retrieves a list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.UserDto'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get all users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user
+      parameters:
+      - description: User registration details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserRegisterReq'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create user
+      tags:
+      - Users
+  /users/{username}:
+    get:
+      description: Retrieves a user by their username
+      parameters:
+      - description: Username of the user to retrieve
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get user by username
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Updates the information of a user
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: Updated user information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update user info
+      tags:
+      - Users
+swagger: "2.0"

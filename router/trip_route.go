@@ -12,8 +12,8 @@ func tripRoutes(router *gin.RouterGroup) {
 	{
 		trips.GET("/", controller.GetTrips(db.DB))
 		trips.GET("/:id", controller.GetTripById(db.DB))
-		trips.PUT("/", controller.CreateTrip(db.DB))
-		trips.POST("/:id", controller.UpdateTrip(db.DB))
+		trips.POST("/", controller.CreateTrip(db.DB))
+		trips.PUT("/:id", controller.UpdateTrip(db.DB))
 		trips.DELETE("/:id", controller.DeleteTrip(db.DB))
 	}
 }

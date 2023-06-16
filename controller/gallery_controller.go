@@ -6,11 +6,23 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/swaggo/gin-swagger"
+	_ "github.com/travor-backend/docs"
 	"github.com/travor-backend/model"
 	"github.com/travor-backend/util"
 	"gorm.io/gorm"
 )
 
+// @Summary Get galleries by destination ID
+// @Description Retrieves a list of galleries based on the provided destination ID
+// @Tags Galleries
+// @Accept json
+// @Produce json
+// @Param des path int true "Destination ID"
+// @Success 200 {object} model.Gallery
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /galleries/{des} [get]
 func GetGalleriesByDesID(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		desID := ctx.Param("des")
@@ -25,6 +37,17 @@ func GetGalleriesByDesID(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Upload image to gallery
+// @Description Uploads an image to the gallery of a specific destination
+// @Tags Galleries
+// @Accept multipart/form-data
+// @Produce json
+// @Param des path int true "Destination ID"
+// @Param image formData file true "Image file to upload"
+// @Success 200 {object} model.Gallery
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /galleries/{des}/upload [post]
 func UploadToGallery(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		file, err := ctx.FormFile("image")
@@ -64,6 +87,16 @@ func UpdateGallery(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+// @Summary Delete a gallery
+// @Description Deletes a gallery by ID
+// @Tags Galleries
+// @Accept json
+// @Produce json
+// @Param id path int true "Gallery ID"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /galleries/{id} [delete]
 func DeleteGallery(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")

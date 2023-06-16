@@ -11,7 +11,7 @@ func userRoutes(router *gin.RouterGroup) {
 	{
 		users.GET("/", controller.GetUsers(db.DB))
 		users.GET("/:username", controller.GetUserByUsername(db.DB))
-		users.PUT("/", controller.CreateUser(db.DB))
-		users.POST("/info/:username", controller.UpdateUserInfo(db.DB))
+		users.POST("/", controller.CreateUser(db.DB))
+		users.PUT("/info/:username", controller.UpdateUserInfo(db.DB))
 	}
 }
