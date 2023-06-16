@@ -34,7 +34,6 @@ func NewServer(config util.Config) (*Server, error) {
 func (server *Server) setupRouter() {
 	router := gin.New()
 	router.Use(middleware.CorsMiddleware())
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := router.Group("/api/v1")
 
@@ -46,6 +45,8 @@ func (server *Server) setupRouter() {
 		userRoutes(api)
 		tripRoutes(api)
 	}
+
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	server.router = router
 }

@@ -1,0 +1,239 @@
+basePath: /api/v1
+definitions:
+  controller.ErrorResponse:
+    properties:
+      error: {}
+    type: object
+  controller.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  dto.DestinationRequestBody:
+    properties:
+      area:
+        type: string
+      country:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      language:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      visa_require:
+        type: string
+    required:
+    - country
+    - description
+    - name
+    - price
+    type: object
+  dto.DestinationsAllResponse:
+    properties:
+      current_page:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/model.Destination'
+        type: array
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  model.Destination:
+    properties:
+      area:
+        type: string
+      country:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      language:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      visa_require:
+        type: string
+    type: object
+host: localhost:8088
+info:
+  contact: {}
+  title: Travor Backend API
+  version: "1.0"
+paths:
+  /destinations:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of destinations
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DestinationsAllResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Get destinations
+      tags:
+      - Destinations
+    put:
+      consumes:
+      - application/json
+      description: Creates a new destination
+      parameters:
+      - description: Destination object to create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DestinationRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.DestinationRequestBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Create a destination
+      tags:
+      - Destinations
+  /destinations/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a destination by ID
+      parameters:
+      - description: Destination ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Delete a destination
+      tags:
+      - Destinations
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a destination based on the provided ID
+      parameters:
+      - description: Destination ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Destination'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Get a destination by ID
+      tags:
+      - Destinations
+    post:
+      consumes:
+      - application/json
+      description: Updates an existing destination
+      parameters:
+      - description: Destination ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated destination object
+        in: body
+        name: destination
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DestinationRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.DestinationRequestBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Update a destination
+      tags:
+      - Destinations
+swagger: "2.0"
