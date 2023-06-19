@@ -8,6 +8,7 @@ type User struct {
 	Phone             string `json:"phone" gorm:"phone"`
 	PasswordChangedAt string `json:"password_changed_at" gorm:"password_changed_at"`
 	CreatedAt         string `json:"created_at" gorm:"created_at"`
+	Role              string `json:"role" gorm:"role"`
 }
 
 func (*User) TableName() string {
