@@ -21,13 +21,17 @@ import (
 func GetTrips(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var response []dto.TripDto
+		payload := ctx.MustGet("authorization_payload").(*util.Payload)
 
-		if err := db.Find(&response).Error; err != nil {
-			ctx.JSON(http.StatusNotFound, util.ErrorResponse(err))
+		if result := db.Where("trips.user = ?", payload.Username).Find(&response); result.Error != nil {
+			ctx.JSON(http.StatusNotFound, util.ErrorResponse(result.Error))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, response)
+		ctx.JSON(http.StatusOK, gin.H{
+			"data":     response,
+			"username": payload.Username,
+		})
 	}
 }
 
@@ -73,8 +77,10 @@ func CreateTrip(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
+		payload := ctx.MustGet("authorization_payload").(*util.Payload)
+
 		trip := dto.TripDto{
-			User:      body.User,
+			User:      payload.Username,
 			PId:       body.PId,
 			Total:     body.Total,
 			Notes:     body.Notes,
