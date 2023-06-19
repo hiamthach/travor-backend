@@ -170,6 +170,8 @@ definitions:
         type: string
       phone:
         type: string
+      status:
+        type: boolean
     type: object
   dto.UserDto:
     properties:
@@ -183,8 +185,35 @@ definitions:
         type: string
       phone:
         type: string
+      status:
+        type: boolean
       username:
         type: string
+    type: object
+  dto.UserLoginReq:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.UserLoginRes:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+      refresh_token:
+        type: string
+      refresh_token_expires_at:
+        type: string
+      session_id:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserDto'
     type: object
   dto.UserRegisterReq:
     properties:
@@ -1063,4 +1092,34 @@ paths:
       summary: Update user info
       tags:
       - Users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user and generates access and refresh tokens
+      parameters:
+      - description: User login request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserLoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserLoginRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Login user
+      tags:
+      - Authentication
 swagger: "2.0"

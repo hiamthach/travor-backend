@@ -9,6 +9,7 @@ type User struct {
 	PasswordChangedAt string `json:"password_changed_at" gorm:"password_changed_at"`
 	CreatedAt         string `json:"created_at" gorm:"created_at"`
 	Role              string `json:"role" gorm:"role"`
+	Status            bool   `json:"status" gorm:"status"`
 }
 
 func (*User) TableName() string {

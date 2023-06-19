@@ -18,4 +18,7 @@ migratedown:
 init-migrate:
 	migrate create -ext sql -dir db/migration -seq
 
-.PHONY: dev server migrateup migratedown init-migrate postgres
+swagger:
+	swag init
+
+.PHONY: dev server migrateup migratedown init-migrate postgres swagger
