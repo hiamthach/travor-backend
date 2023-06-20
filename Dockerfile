@@ -16,7 +16,7 @@ COPY start.sh .
 COPY wait-for.sh .
 COPY db/migration ./db/migration
 
-EXPOSE 8080
+EXPOSE 8088
 RUN dos2unix /app/app.env
 RUN chmod +x /app/start.sh
 CMD ["/app/main"]

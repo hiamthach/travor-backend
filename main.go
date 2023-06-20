@@ -11,7 +11,6 @@ import (
 // @title           Travor Backend API
 // @version         1.0
 
-// @host      localhost:8088
 // @BasePath  /api/v1
 func main() {
 	config, err := util.LoadConfig(".")
