@@ -6,18 +6,14 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/travor-backend/constant"
 	"github.com/travor-backend/util"
-)
-
-const (
-	authorizationHeaderKey  = "authorization"
-	authorizationTypeBearer = "bearer"
-	authorizationPayloadKey = "authorization_payload"
+	"gorm.io/gorm"
 )
 
 func AuthMiddleware(token util.Maker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
+		authorizationHeader := ctx.GetHeader(constant.AUTHORIZATION_HEADER_KEY)
 
 		if len(authorizationHeader) == 0 {
 			err := errors.New("authorization header is not provided")
@@ -34,7 +30,7 @@ func AuthMiddleware(token util.Maker) gin.HandlerFunc {
 		}
 
 		authorizationType := strings.ToLower(fields[0])
-		if authorizationType != authorizationTypeBearer {
+		if authorizationType != constant.AUTHORIZATION_TYPE_BEARER {
 			err := errors.New("authorization type is not Bearer")
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err)
 			return
@@ -48,7 +44,30 @@ func AuthMiddleware(token util.Maker) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set(authorizationPayloadKey, payload)
+		ctx.Set(constant.AUTHORIZATION_PAYLOAD_KEY, payload)
+		ctx.Set(constant.AUTHORIZATION_ROLE, 1)
+		ctx.Next()
+	}
+}
+
+func AdminMiddleware(db *gorm.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		payload := ctx.MustGet(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
+
+		var role int
+
+		if err := db.Table("users").Select("role").Where("username = ?", payload.Username).Scan(&role).Error; err != nil {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err)
+			return
+		}
+
+		if role != constant.ADMIN_ROLE {
+			err := errors.New("no permission")
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err)
+			return
+		}
+
+		ctx.Set(constant.AUTHORIZATION_ROLE, role)
 		ctx.Next()
 	}
 }

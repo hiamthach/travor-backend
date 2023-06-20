@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/swaggo/gin-swagger"
+	"github.com/travor-backend/constant"
 	_ "github.com/travor-backend/docs"
 	"github.com/travor-backend/dto"
 	"github.com/travor-backend/util"
@@ -15,23 +16,21 @@ import (
 // @Description Retrieves a list of trips
 // @Tags Trips
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {array} dto.TripDto
 // @Failure 404 {object} model.ErrorResponse
 // @Router /trips [get]
 func GetTrips(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var response []dto.TripDto
-		payload := ctx.MustGet("authorization_payload").(*util.Payload)
+		payload := ctx.MustGet(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
 
 		if result := db.Where("trips.user = ?", payload.Username).Find(&response); result.Error != nil {
 			ctx.JSON(http.StatusNotFound, util.ErrorResponse(result.Error))
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"data":     response,
-			"username": payload.Username,
-		})
+		ctx.JSON(http.StatusOK, response)
 	}
 }
 
@@ -39,6 +38,7 @@ func GetTrips(db *gorm.DB) gin.HandlerFunc {
 // @Description Retrieves a trip by its ID
 // @Tags Trips
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Trip ID"
 // @Success 200 {object} dto.TripDto
 // @Failure 404 {object} model.ErrorResponse
@@ -47,7 +47,8 @@ func GetTripById(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var response dto.TripDto
 		id := ctx.Param("id")
-		if err := db.First(&response, id).Error; err != nil {
+		payload := ctx.MustGet(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
+		if err := db.Where("trips.user = ?", payload.Username).First(&response, id).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
 				ctx.JSON(http.StatusNotFound, util.ErrorResponse(err))
 				return
@@ -65,6 +66,7 @@ func GetTripById(db *gorm.DB) gin.HandlerFunc {
 // @Tags Trips
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param body body dto.TripDtoBody true "Trip object to be created"
 // @Success 200 {object} dto.TripDto
 // @Failure 500 {object} model.ErrorResponse
@@ -77,7 +79,7 @@ func CreateTrip(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		payload := ctx.MustGet("authorization_payload").(*util.Payload)
+		payload := ctx.MustGet(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
 
 		trip := dto.TripDto{
 			User:      payload.Username,
@@ -100,6 +102,7 @@ func CreateTrip(db *gorm.DB) gin.HandlerFunc {
 // @Tags Trips
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "Trip ID"
 // @Param body body dto.TripDtoUpdate true "Updated trip object"
 // @Success 200 {object} model.SuccessResponse
@@ -115,6 +118,8 @@ func UpdateTrip(db *gorm.DB) gin.HandlerFunc {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
 		}
+		payload := ctx.MustGet(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
+		role := ctx.MustGet(constant.AUTHORIZATION_ROLE).(int)
 
 		if err := ctx.ShouldBindJSON(&body); err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
@@ -128,7 +133,13 @@ func UpdateTrip(db *gorm.DB) gin.HandlerFunc {
 			StartDate: body.StartDate,
 		}
 
-		result := db.Model(&dto.TripDto{}).Where("id = ?", id).Updates(&trip)
+		var result *gorm.DB
+		if role == constant.USER_ROLE {
+			result = db.Model(&dto.TripDto{}).Where("id = ? AND trips.user = ?", id, payload.Username).Updates(&trip)
+		} else {
+			result = db.Model(&dto.TripDto{}).Where("id = ?", id).Updates(&trip)
+		}
+
 		if result.Error != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
@@ -150,6 +161,7 @@ func UpdateTrip(db *gorm.DB) gin.HandlerFunc {
 // @Tags Trips
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "Trip ID"
 // @Success 200 {object} model.SuccessResponse
 // @Failure 404 {object} model.ErrorResponse

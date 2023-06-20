@@ -140,13 +140,10 @@ definitions:
         type: string
       total:
         type: integer
-      user:
-        type: string
     required:
     - p_id
     - start_date
     - total
-    - user
     type: object
   dto.TripDtoUpdate:
     properties:
@@ -739,6 +736,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get trips
       tags:
       - Trips
@@ -764,6 +763,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new trip
       tags:
       - Trips
@@ -793,6 +794,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a trip
       tags:
       - Trips
@@ -815,6 +818,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get trip by ID
       tags:
       - Trips
@@ -849,6 +854,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a trip
       tags:
       - Trips

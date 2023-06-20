@@ -624,6 +624,11 @@
         },
         "/trips": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a list of trips",
                 "produces": [
                     "application/json"
@@ -651,6 +656,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new trip",
                 "consumes": [
                     "application/json"
@@ -691,6 +701,11 @@
         },
         "/trips/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a trip by its ID",
                 "produces": [
                     "application/json"
@@ -724,6 +739,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates an existing trip",
                 "consumes": [
                     "application/json"
@@ -775,6 +795,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a trip by ID",
                 "consumes": [
                     "application/json"
@@ -1427,8 +1452,7 @@
             "required": [
                 "p_id",
                 "start_date",
-                "total",
-                "user"
+                "total"
             ],
             "properties": {
                 "notes": {
@@ -1442,9 +1466,6 @@
                 },
                 "total": {
                     "type": "integer"
-                },
-                "user": {
-                    "type": "string"
                 }
             }
         },

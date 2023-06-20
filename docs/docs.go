@@ -632,6 +632,11 @@ const docTemplate = `{
         },
         "/trips": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a list of trips",
                 "produces": [
                     "application/json"
@@ -659,6 +664,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new trip",
                 "consumes": [
                     "application/json"
@@ -699,6 +709,11 @@ const docTemplate = `{
         },
         "/trips/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a trip by its ID",
                 "produces": [
                     "application/json"
@@ -732,6 +747,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates an existing trip",
                 "consumes": [
                     "application/json"
@@ -783,6 +803,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a trip by ID",
                 "consumes": [
                     "application/json"
@@ -1435,8 +1460,7 @@ const docTemplate = `{
             "required": [
                 "p_id",
                 "start_date",
-                "total",
-                "user"
+                "total"
             ],
             "properties": {
                 "notes": {
@@ -1450,9 +1474,6 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
-                },
-                "user": {
-                    "type": "string"
                 }
             }
         },
