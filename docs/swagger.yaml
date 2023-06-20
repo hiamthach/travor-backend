@@ -307,7 +307,6 @@ definitions:
           $ref: '#/definitions/model.Package'
         type: array
     type: object
-host: localhost:8088
 info:
   contact: {}
   title: Travor Backend API
