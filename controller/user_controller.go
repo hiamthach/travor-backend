@@ -7,6 +7,10 @@ import (
 	_ "github.com/swaggo/gin-swagger"
 	_ "github.com/travor-backend/docs"
 	"github.com/travor-backend/dto"
+	"github.com/travor-backend/model"
+
+	// "github.com/travor-backend/model"
+
 	"github.com/travor-backend/util"
 	"gorm.io/gorm"
 )
@@ -88,6 +92,8 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 			Phone:          body.Phone,
 			FullName:       body.FullName,
 			HashedPassword: hashedPassword,
+			Role:           1,
+			Status:         false,
 		}
 
 		if err := db.Create(&arg).Error; err != nil {
@@ -126,5 +132,80 @@ func UpdateUserInfo(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, util.SuccessResponse("Update user info successfully", nil))
+	}
+}
+
+// @Summary Login user
+// @Description Logs in a user and generates access and refresh tokens
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param body body dto.UserLoginReq true "User login request"
+// @Success 200 {object} dto.UserLoginRes
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /users/login [post]
+func LoginUser(db *gorm.DB, config util.Config, tokenMaker util.Maker) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req dto.UserLoginReq
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+			return
+		}
+
+		var user model.User
+		if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		if err := util.CheckPassword(req.Password, user.HashedPassword); err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		accessToken, accessPayload, err := tokenMaker.CreateToken(user.Username, config.AccessTokenDuration)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		refreshToken, refreshTokenPayload, err := tokenMaker.CreateToken(user.Username, config.RefreshTokenDuration)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		session := dto.UserSessionParams{
+			ID:           refreshTokenPayload.ID,
+			Username:     user.Username,
+			RefreshToken: refreshToken,
+			UserAgent:    ctx.Request.UserAgent(),
+			ClientIp:     ctx.ClientIP(),
+			IsBlocked:    false,
+			ExpiresAt:    refreshTokenPayload.ExpiredAt,
+		}
+
+		if err := db.Create(&session).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		rsp := dto.UserLoginRes{
+			SessionID:             session.ID,
+			AccessToken:           accessToken,
+			RefreshToken:          refreshToken,
+			AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+			RefreshTokenExpiresAt: refreshTokenPayload.ExpiredAt,
+			User: dto.UserDto{
+				Username: user.Username,
+				Email:    user.Email,
+				Phone:    user.Phone,
+				FullName: user.FullName,
+				Status:   user.Status,
+			},
+		}
+
+		ctx.JSON(http.StatusOK, rsp)
 	}
 }

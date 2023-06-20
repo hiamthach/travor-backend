@@ -19,7 +19,6 @@ type TripDto struct {
 }
 
 type TripDtoBody struct {
-	User      string    `json:"user" binding:"required"`
 	PId       int64     `json:"p_id" binding:"required"`
 	Total     int64     `json:"total" binding:"required"`
 	Notes     string    `json:"notes"`

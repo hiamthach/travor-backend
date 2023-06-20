@@ -632,6 +632,11 @@ const docTemplate = `{
         },
         "/trips": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a list of trips",
                 "produces": [
                     "application/json"
@@ -659,6 +664,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new trip",
                 "consumes": [
                     "application/json"
@@ -699,6 +709,11 @@ const docTemplate = `{
         },
         "/trips/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a trip by its ID",
                 "produces": [
                     "application/json"
@@ -732,6 +747,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates an existing trip",
                 "consumes": [
                     "application/json"
@@ -783,6 +803,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a trip by ID",
                 "consumes": [
                     "application/json"
@@ -1108,6 +1133,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/login": {
+            "post": {
+                "description": "Logs in a user and generates access and refresh tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "User login request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserLoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserLoginRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{username}": {
             "get": {
                 "description": "Retrieves a user by their username",
@@ -1389,8 +1460,7 @@ const docTemplate = `{
             "required": [
                 "p_id",
                 "start_date",
-                "total",
-                "user"
+                "total"
             ],
             "properties": {
                 "notes": {
@@ -1404,9 +1474,6 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
-                },
-                "user": {
-                    "type": "string"
                 }
             }
         },
@@ -1443,6 +1510,9 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1464,8 +1534,49 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "boolean"
+                },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.UserLoginReq": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserLoginRes": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "access_token_expires_at": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "refresh_token_expires_at": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/dto.UserDto"
                 }
             }
         },

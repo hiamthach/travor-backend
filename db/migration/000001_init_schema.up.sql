@@ -102,10 +102,6 @@ CREATE UNIQUE INDEX ON "packages_types" ("p_id", "t_id");
 
 CREATE UNIQUE INDEX ON "plans" ("p_id", "order");
 
-CREATE INDEX ON "trips" ("user");
-
-CREATE INDEX ON "trips" ("user", "p_id");
-
 ALTER TABLE "galleries" ADD FOREIGN KEY ("des_id") REFERENCES "destinations" ("id");
 
 ALTER TABLE "packages" ADD FOREIGN KEY ("des_id") REFERENCES "destinations" ("id");
