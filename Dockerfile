@@ -1,16 +1,17 @@
 # Build stage
-FROM golang:1.20-alpine3.18 AS builder
+FROM golang:1.20-alpine3.18
 WORKDIR /app
+COPY go.mod ./
+COPY go.sum ./
+COPY app.env ./
+#RUN go mod download
+RUN go get -d -v ./...
+#RUN go mod vendor
+
 COPY . .
-RUN go build -o main main.go
-# Run stage
-FROM alpine:3.18
-WORKDIR /app
-COPY --from=builder /app/main .
-COPY app.env .
+
+RUN go build -o /travor-backend
 
 EXPOSE 8088
-RUN dos2unix /app/app.env
-RUN chmod +x /app/start.sh
-CMD ["/app/main"]
-ENTRYPOINT [ "/app/start.sh" ]
+
+CMD [ "/travor-backend" ]
