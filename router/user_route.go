@@ -14,6 +14,7 @@ func userRoutes(router *gin.RouterGroup) {
 		users.GET("/:username", controller.GetUserByUsername(db.DB))
 		users.POST("/", controller.CreateUser(db.DB))
 		users.POST("/login", controller.LoginUser(db.DB, Config, TokenMaker))
+		users.POST("/renew-token", controller.RenewToken(db.DB, TokenMaker))
 
 		users.Use(middleware.AuthMiddleware(TokenMaker))
 		users.Use(middleware.AdminMiddleware(db.DB))

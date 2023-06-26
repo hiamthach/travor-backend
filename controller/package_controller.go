@@ -85,6 +85,7 @@ func GetPackageById(db *gorm.DB) gin.HandlerFunc {
 // @Tags Packages
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param body body dto.PackageRequestBody true "Package object to create"
 // @Success 201 {object} model.Package
 // @Failure 400 {object} model.ErrorResponse
@@ -134,6 +135,7 @@ func CreatePackage(db *gorm.DB) gin.HandlerFunc {
 // @Tags Packages
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Package ID"
 // @Param body body dto.PackageRequestBody true "Updated package object"
 // @Success 200 {object} dto.PackageRequestBody
@@ -205,6 +207,7 @@ func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 // @Tags Packages
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Package ID"
 // @Success 200 {object} model.SuccessResponse
 // @Failure 404 {object} model.ErrorResponse

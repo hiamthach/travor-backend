@@ -79,6 +79,7 @@ func GetDestinationById(db *gorm.DB) gin.HandlerFunc {
 // @Tags Destinations
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param body body dto.DestinationRequestBody true "Destination object to create"
 // @Success 201 {object} dto.DestinationRequestBody
 // @Failure 400 {object} model.ErrorResponse
@@ -106,6 +107,7 @@ func CreateDestination(db *gorm.DB) gin.HandlerFunc {
 // @Tags Destinations
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Destination ID"
 // @Param destination body dto.DestinationRequestBody true "Updated destination object"
 // @Success 200 {object} dto.DestinationRequestBody
@@ -150,6 +152,7 @@ func UpdateDestination(db *gorm.DB) gin.HandlerFunc {
 // @Tags Destinations
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Destination ID"
 // @Success 200 {object} model.SuccessResponse
 // @Failure 404 {object} model.ErrorResponse

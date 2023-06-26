@@ -110,6 +110,20 @@ definitions:
       total:
         type: integer
     type: object
+  dto.RenewTokenReq:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  dto.RenewTokenRes:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+    type: object
   dto.TripDto:
     properties:
       id:
@@ -349,6 +363,12 @@ paths:
       - application/json
       description: Creates a new destination
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Destination object to create
         in: body
         name: body
@@ -379,6 +399,12 @@ paths:
       - application/json
       description: Deletes a destination by ID
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Destination ID
         in: path
         name: id
@@ -435,6 +461,12 @@ paths:
       - application/json
       description: Updates an existing destination
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Destination ID
         in: path
         name: id
@@ -504,6 +536,12 @@ paths:
       - multipart/form-data
       description: Uploads an image to the gallery of a specific destination
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Destination ID
         in: path
         name: des
@@ -538,6 +576,12 @@ paths:
       - application/json
       description: Deletes a gallery by ID
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Gallery ID
         in: path
         name: id
@@ -600,6 +644,12 @@ paths:
       - application/json
       description: Creates a new package
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Package object to create
         in: body
         name: body
@@ -630,6 +680,12 @@ paths:
       - application/json
       description: Deletes a package by ID
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Package ID
         in: path
         name: id
@@ -686,6 +742,12 @@ paths:
       - application/json
       description: Updates an existing package
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Package ID
         in: path
         name: id
@@ -719,9 +781,50 @@ paths:
       summary: Update a package
       tags:
       - Packages
+  /renew-token:
+    post:
+      consumes:
+      - application/json
+      description: Renews the access token using a valid refresh token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RenewTokenReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RenewTokenRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Renew access token
+      tags:
+      - Authentication
   /trips:
     get:
       description: Retrieves a list of trips
+      parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -745,6 +848,12 @@ paths:
       - application/json
       description: Creates a new trip
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Trip object to be created
         in: body
         name: body
@@ -773,6 +882,12 @@ paths:
       - application/json
       description: Deletes a trip by ID
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Trip ID
         in: path
         name: id
@@ -801,6 +916,12 @@ paths:
     get:
       description: Retrieves a trip by its ID
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Trip ID
         in: path
         name: id
@@ -827,6 +948,12 @@ paths:
       - application/json
       description: Updates an existing trip
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Trip ID
         in: path
         name: id
@@ -884,6 +1011,12 @@ paths:
       - application/json
       description: Creates a new type
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Type object to create
         in: body
         name: type_
@@ -917,6 +1050,12 @@ paths:
         name: id
         required: true
         type: integer
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -968,6 +1107,12 @@ paths:
       - application/json
       description: Updates an existing type by ID
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Type ID
         in: path
         name: id
@@ -1048,12 +1193,6 @@ paths:
   /users/{username}:
     get:
       description: Retrieves a user by their username
-      parameters:
-      - description: Username of the user to retrieve
-        in: path
-        name: username
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -1073,6 +1212,12 @@ paths:
       - application/json
       description: Updates the information of a user
       parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Username
         in: path
         name: username

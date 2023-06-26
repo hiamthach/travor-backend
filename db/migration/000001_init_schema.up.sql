@@ -49,14 +49,6 @@ CREATE TABLE "packages_types" (
   PRIMARY KEY ("p_id", "t_id")
 );
 
-CREATE TABLE "plans" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "p_id" int NOT NULL,
-  "order" smallint NOT NULL,
-  "name" varchar NOT NULL,
-  "description" varchar NOT NULL
-);
-
 CREATE TABLE "trips" (
   "id" BIGSERIAL PRIMARY KEY,
   "user" varchar NOT NULL,
@@ -100,8 +92,6 @@ CREATE INDEX ON "packages" ("name");
 
 CREATE UNIQUE INDEX ON "packages_types" ("p_id", "t_id");
 
-CREATE UNIQUE INDEX ON "plans" ("p_id", "order");
-
 ALTER TABLE "galleries" ADD FOREIGN KEY ("des_id") REFERENCES "destinations" ("id");
 
 ALTER TABLE "packages" ADD FOREIGN KEY ("des_id") REFERENCES "destinations" ("id");
@@ -109,8 +99,6 @@ ALTER TABLE "packages" ADD FOREIGN KEY ("des_id") REFERENCES "destinations" ("id
 ALTER TABLE "packages_types" ADD FOREIGN KEY ("p_id") REFERENCES "packages" ("id");
 
 ALTER TABLE "packages_types" ADD FOREIGN KEY ("t_id") REFERENCES "types" ("id");
-
-ALTER TABLE "plans" ADD FOREIGN KEY ("p_id") REFERENCES "packages" ("id");
 
 ALTER TABLE "trips" ADD FOREIGN KEY ("user") REFERENCES "users" ("username");
 

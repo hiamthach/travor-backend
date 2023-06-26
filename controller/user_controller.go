@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/swaggo/gin-swagger"
@@ -39,7 +41,6 @@ func GetUsers(db *gorm.DB) gin.HandlerFunc {
 // @Description Retrieves a user by their username
 // @Tags Users
 // @Produce json
-// @Param username path string true "Username of the user to retrieve"
 // @Success 200 {object} dto.UserDto
 // @Failure 404 {object} model.ErrorResponse
 // @Router /users/{username} [get]
@@ -110,6 +111,7 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 // @Tags Users
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param username path string true "Username"
 // @Param user body dto.UpdateUserInfo true "Updated user information"
 // @Success 200 {object} model.SuccessResponse
@@ -207,5 +209,59 @@ func LoginUser(db *gorm.DB, config util.Config, tokenMaker util.Maker) gin.Handl
 		}
 
 		ctx.JSON(http.StatusOK, rsp)
+	}
+}
+
+// @Summary Renew access token
+// @Description Renews the access token using a valid refresh token
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body dto.RenewTokenReq true "Refresh token request"
+// @Success 200 {object} dto.RenewTokenRes
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 401 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /renew-token [post]
+func RenewToken(db *gorm.DB, token util.Maker) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req dto.RenewTokenReq
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
+			return
+		}
+
+		refreshToken, err := token.VerifyToken(req.RefreshToken)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		var session dto.UserSessionParams
+		if err := db.Where("id = ?", refreshToken.ID).First(&session).Error; err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		if session.IsBlocked {
+			ctx.JSON(http.StatusUnauthorized, util.ErrorResponse(errors.New("refresh token is blocked")))
+			return
+		}
+
+		if session.RefreshToken != req.RefreshToken {
+			ctx.JSON(http.StatusUnauthorized, util.ErrorResponse(errors.New("refresh token is invalid")))
+			return
+		}
+
+		accessToken, accessPayload, err := token.CreateToken(session.Username, time.Minute*15)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusOK, dto.RenewTokenRes{
+			AccessToken:          accessToken,
+			AccessTokenExpiresAt: accessPayload.ExpiredAt,
+		})
 	}
 }

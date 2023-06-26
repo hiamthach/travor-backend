@@ -42,6 +42,7 @@ func GetGalleriesByDesID(db *gorm.DB) gin.HandlerFunc {
 // @Tags Galleries
 // @Accept multipart/form-data
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param des path int true "Destination ID"
 // @Param image formData file true "Image file to upload"
 // @Success 200 {object} model.Gallery
@@ -92,6 +93,7 @@ func UpdateGallery(db *gorm.DB) gin.HandlerFunc {
 // @Tags Galleries
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Gallery ID"
 // @Success 200 {object} model.SuccessResponse
 // @Failure 404 {object} model.ErrorResponse
