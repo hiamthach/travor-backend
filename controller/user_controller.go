@@ -222,7 +222,7 @@ func LoginUser(db *gorm.DB, config util.Config, tokenMaker util.Maker) gin.Handl
 // @Failure 400 {object} model.ErrorResponse
 // @Failure 401 {object} model.ErrorResponse
 // @Failure 500 {object} model.ErrorResponse
-// @Router /renew-token [post]
+// @Router /users/renew-token [post]
 func RenewToken(db *gorm.DB, token util.Maker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req dto.RenewTokenReq

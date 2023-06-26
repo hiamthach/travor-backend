@@ -32,3 +32,16 @@ type DestinationRequestBody struct {
 	Location    string `json:"location"`
 	DestinationTable
 }
+
+type DestinationRequestUpdateBody struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       int    `json:"price"`
+	Country     string `json:"country"`
+	VisaRequire string `json:"visa_require"`
+	Language    string `json:"language"`
+	Currency    string `json:"currency"`
+	Area        string `json:"area"`
+	Location    string `json:"location"`
+	DestinationTable
+}
