@@ -78,6 +78,14 @@ const docTemplate = `{
                 "summary": "Create a destination",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Destination object to create",
                         "name": "body",
                         "in": "body",
@@ -166,6 +174,14 @@ const docTemplate = `{
                 "summary": "Update a destination",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Destination ID",
                         "name": "id",
@@ -222,6 +238,14 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a destination",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Destination ID",
@@ -311,6 +335,14 @@ const docTemplate = `{
                 "summary": "Upload image to gallery",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Destination ID",
                         "name": "des",
@@ -361,6 +393,14 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a gallery",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Gallery ID",
@@ -456,6 +496,14 @@ const docTemplate = `{
                 "summary": "Create a package",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Package object to create",
                         "name": "body",
                         "in": "body",
@@ -544,6 +592,14 @@ const docTemplate = `{
                 "summary": "Update a package",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Package ID",
                         "name": "id",
@@ -601,6 +657,14 @@ const docTemplate = `{
                 "summary": "Delete a package",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Package ID",
                         "name": "id",
@@ -630,6 +694,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/renew-token": {
+            "post": {
+                "description": "Renews the access token using a valid refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Renew access token",
+                "parameters": [
+                    {
+                        "description": "Refresh token request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RenewTokenReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RenewTokenRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/trips": {
             "get": {
                 "security": [
@@ -645,6 +761,16 @@ const docTemplate = `{
                     "Trips"
                 ],
                 "summary": "Get trips",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -681,6 +807,14 @@ const docTemplate = `{
                 ],
                 "summary": "Create a new trip",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Trip object to be created",
                         "name": "body",
@@ -724,6 +858,14 @@ const docTemplate = `{
                 "summary": "Get trip by ID",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Trip ID",
                         "name": "id",
@@ -764,6 +906,14 @@ const docTemplate = `{
                 ],
                 "summary": "Update a trip",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Trip ID",
@@ -820,6 +970,14 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a trip",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Trip ID",
@@ -894,6 +1052,14 @@ const docTemplate = `{
                 ],
                 "summary": "Create new type",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Type object to create",
                         "name": "type_",
@@ -983,6 +1149,14 @@ const docTemplate = `{
                 "summary": "Update type by ID",
                 "parameters": [
                     {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Type ID",
                         "name": "id",
@@ -1041,6 +1215,14 @@ const docTemplate = `{
                         "description": "Type ID",
                         "name": "id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -1189,15 +1371,6 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Get user by username",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username of the user to retrieve",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1226,6 +1399,14 @@ const docTemplate = `{
                 ],
                 "summary": "Update user info",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003caccess_token\u003e",
+                        "description": "Bearer {access_token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Username",
@@ -1423,6 +1604,28 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.RenewTokenReq": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RenewTokenRes": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "access_token_expires_at": {
+                    "type": "string"
                 }
             }
         },

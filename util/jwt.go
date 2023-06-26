@@ -102,3 +102,24 @@ func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 
 	return payload, nil
 }
+
+func (maker *JWTMaker) RenewToken(refreshToken string, accessTokenDuration, refreshTokenDuration time.Duration) (string, *Payload, error) {
+	// Verify and parse the refresh token
+	refreshPayload, err := maker.VerifyToken(refreshToken)
+	if err != nil {
+		return "", nil, err
+	}
+
+	// Check if the refresh token has expired
+	if err := refreshPayload.Valid(); err != nil {
+		return "", nil, err
+	}
+
+	// Create a new access token using the same username and a new duration
+	newAccessToken, _, err := maker.CreateToken(refreshPayload.Username, accessTokenDuration)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return newAccessToken, refreshPayload, nil
+}

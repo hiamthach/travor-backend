@@ -56,6 +56,7 @@ func GetTypeById(db *gorm.DB) gin.HandlerFunc {
 // @Tags Types
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param type_ body dto.TypeDto true "Type object to create"
 // @Success 200 {object} dto.TypeDto
 // @Failure 400 {object} model.ErrorResponse
@@ -84,6 +85,7 @@ func CreateType(db *gorm.DB) gin.HandlerFunc {
 // @Tags Types
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Type ID"
 // @Param type_ body dto.TypeDto true "Type object to update"
 // @Success 200 {object} model.SuccessResponse
@@ -111,6 +113,7 @@ func UpdateType(db *gorm.DB) gin.HandlerFunc {
 // @Tags Types
 // @Param id path int true "Type ID"
 // @Produce json
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Success 200 {object} model.SuccessResponse
 // @Failure 404 {object} model.ErrorResponse
 // @Failure 500 {object} model.ErrorResponse

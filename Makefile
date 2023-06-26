@@ -1,5 +1,5 @@
 DB_URL=postgresql://root:123456@localhost:5432/travor-backend?sslmode=disable
-# DB_URL=postgres://gsjnfegy:A32BXqJwidzvfooavwHdGjY_W2zkbUTC@satao.db.elephantsql.com/gsjnfegy
+
 dev:
 	air
 

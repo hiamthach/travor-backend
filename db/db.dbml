@@ -67,18 +67,6 @@ Table packages_types as PT {
   }
 }
 
-Table plans {
-  id bigserial [pk, increment]
-  p_id int [not null, ref: > P.id]
-  order smallint [not null]
-  name varchar [not null]
-  description varchar [not null]
-
-  Indexes {
-    (p_id, order) [unique]
-  }
-}
-
 Table trips {
   id bigserial [pk, increment]
   user varchar [not null, ref: > U.username]

@@ -80,6 +80,15 @@ type UserSessionParams struct {
 	IsBlocked    bool      `json:"is_blocked"`
 }
 
+type RenewTokenReq struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+type RenewTokenRes struct {
+	AccessToken          string    `json:"access_token"`
+	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
+}
+
 func (*UserSessionParams) TableName() string {
 	return "sessions"
 }

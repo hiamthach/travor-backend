@@ -17,6 +17,7 @@ import (
 // @Tags Trips
 // @Produce json
 // @Security BearerAuth
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Success 200 {array} dto.TripDto
 // @Failure 404 {object} model.ErrorResponse
 // @Router /trips [get]
@@ -39,6 +40,7 @@ func GetTrips(db *gorm.DB) gin.HandlerFunc {
 // @Tags Trips
 // @Produce json
 // @Security BearerAuth
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Trip ID"
 // @Success 200 {object} dto.TripDto
 // @Failure 404 {object} model.ErrorResponse
@@ -67,6 +69,7 @@ func GetTripById(db *gorm.DB) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param body body dto.TripDtoBody true "Trip object to be created"
 // @Success 200 {object} dto.TripDto
 // @Failure 500 {object} model.ErrorResponse
@@ -103,6 +106,7 @@ func CreateTrip(db *gorm.DB) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path string true "Trip ID"
 // @Param body body dto.TripDtoUpdate true "Updated trip object"
 // @Success 200 {object} model.SuccessResponse
@@ -162,6 +166,7 @@ func UpdateTrip(db *gorm.DB) gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
+// @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path string true "Trip ID"
 // @Success 200 {object} model.SuccessResponse
 // @Failure 404 {object} model.ErrorResponse
