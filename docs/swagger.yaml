@@ -28,6 +28,27 @@ definitions:
     - name
     - price
     type: object
+  dto.DestinationRequestUpdateBody:
+    properties:
+      area:
+        type: string
+      country:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      language:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      visa_require:
+        type: string
+    type: object
   dto.DestinationsAllResponse:
     properties:
       current_page:
@@ -96,6 +117,30 @@ definitions:
     - details
     - name
     - price
+    type: object
+  dto.PackageRequestUpdateBody:
+    properties:
+      des_id:
+        type: integer
+      details:
+        type: string
+      duration:
+        type: string
+      img_url:
+        type: string
+      name:
+        type: string
+      number_people:
+        type: integer
+      price:
+        type: integer
+      types:
+        items:
+          properties:
+            id:
+              type: integer
+          type: object
+        type: array
     type: object
   dto.PackagesAllResponse:
     properties:
@@ -477,14 +522,14 @@ paths:
         name: destination
         required: true
         schema:
-          $ref: '#/definitions/dto.DestinationRequestBody'
+          $ref: '#/definitions/dto.DestinationRequestUpdateBody'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.DestinationRequestBody'
+            $ref: '#/definitions/model.SuccessResponse'
         "400":
           description: Bad Request
           schema:
@@ -758,14 +803,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/dto.PackageRequestBody'
+          $ref: '#/definitions/dto.PackageRequestUpdateBody'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.PackageRequestBody'
+            $ref: '#/definitions/model.SuccessResponse'
         "400":
           description: Bad Request
           schema:
@@ -781,40 +826,6 @@ paths:
       summary: Update a package
       tags:
       - Packages
-  /renew-token:
-    post:
-      consumes:
-      - application/json
-      description: Renews the access token using a valid refresh token
-      parameters:
-      - description: Refresh token request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.RenewTokenReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.RenewTokenRes'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      summary: Renew access token
-      tags:
-      - Authentication
   /trips:
     get:
       description: Retrieves a list of trips
@@ -1271,6 +1282,40 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrorResponse'
       summary: Login user
+      tags:
+      - Authentication
+  /users/renew-token:
+    post:
+      consumes:
+      - application/json
+      description: Renews the access token using a valid refresh token
+      parameters:
+      - description: Refresh token request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RenewTokenReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RenewTokenRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Renew access token
       tags:
       - Authentication
 swagger: "2.0"

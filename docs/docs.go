@@ -194,7 +194,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.DestinationRequestBody"
+                            "$ref": "#/definitions/dto.DestinationRequestUpdateBody"
                         }
                     }
                 ],
@@ -202,7 +202,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.DestinationRequestBody"
+                            "$ref": "#/definitions/model.SuccessResponse"
                         }
                     },
                     "400": {
@@ -612,7 +612,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PackageRequestBody"
+                            "$ref": "#/definitions/dto.PackageRequestUpdateBody"
                         }
                     }
                 ],
@@ -620,7 +620,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.PackageRequestBody"
+                            "$ref": "#/definitions/model.SuccessResponse"
                         }
                     },
                     "400": {
@@ -681,58 +681,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/renew-token": {
-            "post": {
-                "description": "Renews the access token using a valid refresh token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Renew access token",
-                "parameters": [
-                    {
-                        "description": "Refresh token request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.RenewTokenReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.RenewTokenRes"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
                         }
@@ -1361,6 +1309,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/renew-token": {
+            "post": {
+                "description": "Renews the access token using a valid refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Renew access token",
+                "parameters": [
+                    {
+                        "description": "Refresh token request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RenewTokenReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RenewTokenRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{username}": {
             "get": {
                 "description": "Retrieves a user by their username",
@@ -1483,6 +1483,38 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.DestinationRequestUpdateBody": {
+            "type": "object",
+            "properties": {
+                "area": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "visa_require": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.DestinationsAllResponse": {
             "type": "object",
             "properties": {
@@ -1561,6 +1593,43 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "img_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number_people": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "types": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "dto.PackageRequestUpdateBody": {
+            "type": "object",
+            "properties": {
+                "des_id": {
+                    "type": "integer"
+                },
+                "details": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
                 },
                 "img_url": {
                     "type": "string"
