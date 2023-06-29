@@ -575,7 +575,42 @@ paths:
       summary: Get galleries by destination ID
       tags:
       - Galleries
-  /galleries/{des}/upload:
+  /galleries/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a gallery by ID
+      parameters:
+      - default: Bearer <access_token>
+        description: Bearer {access_token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Gallery ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete a gallery
+      tags:
+      - Galleries
+  /galleries/upload/{des}:
     post:
       consumes:
       - multipart/form-data
@@ -613,41 +648,6 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrorResponse'
       summary: Upload image to gallery
-      tags:
-      - Galleries
-  /galleries/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Deletes a gallery by ID
-      parameters:
-      - default: Bearer <access_token>
-        description: Bearer {access_token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Gallery ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.SuccessResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      summary: Delete a gallery
       tags:
       - Galleries
   /packages:

@@ -276,51 +276,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/galleries/{des}": {
-            "get": {
-                "description": "Retrieves a list of galleries based on the provided destination ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Galleries"
-                ],
-                "summary": "Get galleries by destination ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Destination ID",
-                        "name": "des",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Gallery"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/model.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/galleries/{des}/upload": {
+        "/galleries/upload/{des}": {
             "post": {
                 "description": "Uploads an image to the gallery of a specific destination",
                 "consumes": [
@@ -366,6 +322,50 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/galleries/{des}": {
+            "get": {
+                "description": "Retrieves a list of galleries based on the provided destination ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Galleries"
+                ],
+                "summary": "Get galleries by destination ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Destination ID",
+                        "name": "des",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Gallery"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
                         }
