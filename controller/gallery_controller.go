@@ -48,7 +48,7 @@ func GetGalleriesByDesID(db *gorm.DB) gin.HandlerFunc {
 // @Success 200 {object} model.Gallery
 // @Failure 400 {object} model.ErrorResponse
 // @Failure 500 {object} model.ErrorResponse
-// @Router /galleries/{des}/upload [post]
+// @Router /galleries/upload/{des} [post]
 func UploadToGallery(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		file, err := ctx.FormFile("image")
@@ -56,12 +56,14 @@ func UploadToGallery(db *gorm.DB) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
+
 		desIDStr := ctx.Param("des")
 		desID, err := strconv.ParseUint(desIDStr, 10, 64)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
+
 		var gallery model.Gallery
 
 		url, err := util.UploadFile(file, ctx)
@@ -73,7 +75,7 @@ func UploadToGallery(db *gorm.DB) gin.HandlerFunc {
 		gallery.DesID = desID
 		gallery.URL = url.MediaLink
 
-		if err = db.Create(&gallery).Error; err != nil {
+		if err := db.Create(&gallery).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
 		}

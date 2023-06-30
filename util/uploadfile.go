@@ -3,7 +3,6 @@ package util
 import (
 	"context"
 	"fmt"
-	"image"
 	"io"
 	"mime/multipart"
 	"time"
@@ -35,10 +34,10 @@ func UploadFile(file *multipart.FileHeader, ctx *gin.Context) (*stor.ObjectAttrs
 	}
 	defer src.Close()
 
-	_, _, err = image.DecodeConfig(src)
-	if err != nil {
-		return nil, err
-	}
+	// _, _, err = image.DecodeConfig(src)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	filename := generateFilename(file.Filename)
 	folderPath := "images/galleries/" + filename
