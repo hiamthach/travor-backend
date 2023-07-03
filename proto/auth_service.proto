@@ -3,6 +3,7 @@ syntax = "proto3";
 package pb;
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/travor-backend/pb";
 
@@ -13,6 +14,23 @@ service AuthService {
       body: "*"
     };
   }
+
+  rpc CreateUser(CreateUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/v1/auth/register"
+      body: "*"
+    };
+  }
+}
+
+message User {
+  string username = 1;
+  string email = 2;
+  string phone = 3;
+  string full_name = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp password_changed_at = 6;
+  bool status = 7;
 }
 
 message LoginRequest {
@@ -21,6 +39,18 @@ message LoginRequest {
 }
 
 message LoginResponse {
-  string token = 1;
-  string error = 2;
+  User user = 1;
+  string session_id = 2;
+  string access_token = 3;
+  string refresh_token = 4;
+  google.protobuf.Timestamp access_token_expires_at = 5;
+  google.protobuf.Timestamp refresh_token_expires_at = 6;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string phone = 3;
+  string full_name = 4;
+  string password = 5;
 }

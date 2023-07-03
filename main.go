@@ -42,7 +42,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Can not connect to database: ", err)
 	}
-
 	go runGatewayServer(config, db.DB)
 	runGRPCServer(config, db.DB)
 }
