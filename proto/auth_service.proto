@@ -10,14 +10,14 @@ option go_package = "github.com/travor-backend/pb";
 service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse) {
     option (google.api.http) = {
-      post: "/v1/auth/login"
+      post: "/auth/login"
       body: "*"
     };
   }
 
   rpc CreateUser(CreateUserRequest) returns (User) {
     option (google.api.http) = {
-      post: "/v1/auth/register"
+      post: "/auth/register"
       body: "*"
     };
   }
