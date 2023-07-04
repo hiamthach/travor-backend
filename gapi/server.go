@@ -39,12 +39,12 @@ func (server *GRPCServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.
 		return nil, err
 	}
 
-	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration)
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration, server.config.AccessTokenPrivateKey)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration)
+	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, server.config.RefreshTokenPrivateKey)
 	if err != nil {
 		return nil, err
 	}

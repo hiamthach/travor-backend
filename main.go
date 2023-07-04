@@ -26,6 +26,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Can not load config: ", err)
 	}
+	_, err = db.GetInstance(config.DBSource)
+	if err != nil {
+		log.Fatal("Can not connect to database: ", err)
+	}
 
 	// Run Gin Server
 	// server, err := router.NewServer(config)
@@ -38,10 +42,7 @@ func main() {
 	// 	log.Fatal("Can not start server: ", err)
 	// }
 
-	_, err = db.GetInstance(config.DBSource)
-	if err != nil {
-		log.Fatal("Can not connect to database: ", err)
-	}
+	// Run gRPC Server
 	go runGatewayServer(config, db.DB)
 	runGRPCServer(config, db.DB)
 }
@@ -96,12 +97,12 @@ func runGatewayServer(config util.Config, store *gorm.DB) {
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
 
-	listener, err := net.Listen("tcp", config.ServerAddress)
+	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatal("Can not start server: ", err)
 	}
 
-	log.Println("Starting gateway server on", config.ServerAddress)
+	log.Println("Starting gateway server on", ":8080")
 
 	err = http.Serve(listener, mux)
 	if err != nil {

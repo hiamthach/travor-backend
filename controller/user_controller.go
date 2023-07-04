@@ -166,13 +166,13 @@ func LoginUser(db *gorm.DB, config util.Config, tokenMaker util.Maker) gin.Handl
 			return
 		}
 
-		accessToken, accessPayload, err := tokenMaker.CreateToken(user.Username, config.AccessTokenDuration)
+		accessToken, accessPayload, err := tokenMaker.CreateToken(user.Username, config.AccessTokenDuration, config.AccessTokenPrivateKey)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
 		}
 
-		refreshToken, refreshTokenPayload, err := tokenMaker.CreateToken(user.Username, config.RefreshTokenDuration)
+		refreshToken, refreshTokenPayload, err := tokenMaker.CreateToken(user.Username, config.RefreshTokenDuration, config.RefreshTokenPrivateKey)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
@@ -225,13 +225,18 @@ func LoginUser(db *gorm.DB, config util.Config, tokenMaker util.Maker) gin.Handl
 // @Router /users/renew-token [post]
 func RenewToken(db *gorm.DB, token util.Maker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		config, err := util.LoadConfig(".")
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
+			return
+		}
 		var req dto.RenewTokenReq
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
 
-		refreshToken, err := token.VerifyToken(req.RefreshToken)
+		refreshToken, err := token.VerifyToken(req.RefreshToken, config.RefreshTokenPublicKey)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
@@ -253,7 +258,7 @@ func RenewToken(db *gorm.DB, token util.Maker) gin.HandlerFunc {
 			return
 		}
 
-		accessToken, accessPayload, err := token.CreateToken(session.Username, time.Minute*15)
+		accessToken, accessPayload, err := token.CreateToken(session.Username, time.Minute*15, config.AccessTokenPrivateKey)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
