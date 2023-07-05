@@ -75,7 +75,7 @@ func RunGatewayServer(config util.Config, store *gorm.DB) {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/", grpcMux)
+	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", grpcMux))
 
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
