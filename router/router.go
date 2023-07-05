@@ -14,15 +14,10 @@ type Server struct {
 	router *gin.Engine
 }
 
-var TokenMaker util.Maker
 var Config util.Config
 
 func NewServer(config util.Config) (*Server, error) {
 	var err error
-	TokenMaker, err = util.NewJWTMaker(config.TokenSymmetricKey)
-	if err != nil {
-		return nil, err
-	}
 
 	Config = config
 	server := &Server{config: config}

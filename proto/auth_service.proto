@@ -21,6 +21,19 @@ service AuthService {
       body: "*"
     };
   }
+
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/auth/user/{username}"
+    };
+  }
+
+  rpc RenewToken(RenewTokenRequest) returns (RenewTokenResponse) {
+    option (google.api.http) = {
+      post: "/auth/renew"
+      body: "*"
+    };
+  }
 }
 
 message User {
@@ -53,4 +66,17 @@ message CreateUserRequest {
   string phone = 3;
   string full_name = 4;
   string password = 5;
+}
+
+message GetUserRequest {
+  string username = 1;
+}
+
+message RenewTokenRequest {
+  string refresh_token = 1;
+}
+
+message RenewTokenResponse {
+  string access_token = 1;
+  google.protobuf.Timestamp access_token_expires_at = 2;
 }

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/travor-backend/pb";
+
+service DestinationService {
+  rpc GetDestinations(GetDestinationsRequest) returns (GetDestinationsResponse) {
+    option (google.api.http) = {
+      get: "/destinations"
+    };
+  }
+}
+
+message Destination {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string country = 5;
+  string visa_require = 6;
+  string language = 7;
+  string currency = 8;
+  string area = 9;
+  string location = 10;
+}
+
+message GetDestinationsRequest {
+  uint32 page = 1;
+  uint32 page_size = 2;
+}
+
+message GetDestinationsResponse {
+  repeated Destination destinations = 1;
+}

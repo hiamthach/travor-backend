@@ -3,97 +3,89 @@ package gapi
 import (
 	"context"
 	"log"
+	"net"
+	"net/http"
 
-	"github.com/travor-backend/dto"
-	"github.com/travor-backend/model"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/travor-backend/pb"
 	"github.com/travor-backend/util"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
 	"gorm.io/gorm"
 )
 
-type GRPCServer struct {
-	config     util.Config
-	store      *gorm.DB
-	tokenMaker util.Maker
-	pb.UnimplementedAuthServiceServer
+func RunGRPCServer(config util.Config, store *gorm.DB) {
+	authServer, err := NewAuthServer(store, config)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	destinationServer, err := NewDestinationServer(store, config)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	grpcServer := grpc.NewServer()
+
+	pb.RegisterAuthServiceServer(grpcServer, authServer)
+	pb.RegisterDestinationServiceServer(grpcServer, destinationServer)
+
+	listener, err := net.Listen("tcp", config.GRPCServerAddress)
+	if err != nil {
+		log.Fatal("Can not start server: ", err)
+	}
+
+	log.Println("Starting gRPC server on", config.GRPCServerAddress)
+	err = grpcServer.Serve(listener)
+	if err != nil {
+		log.Fatal("Can not start server: ", err)
+	}
 }
 
-func NewGRPCServer(store *gorm.DB, config util.Config) (*GRPCServer, error) {
-	tokenMaker, err := util.NewJWTMaker(config.TokenSymmetricKey)
+func RunGatewayServer(config util.Config, store *gorm.DB) {
+	authServer, err := NewAuthServer(store, config)
 	if err != nil {
-		log.Fatal("Can not create token maker: ", err)
+		log.Fatal("Can not create server: ", err)
 	}
-	return &GRPCServer{store: store, config: config, tokenMaker: tokenMaker}, nil
-}
-
-func (server *GRPCServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	var user model.User
-
-	err := server.store.Table("users").Where("username = ?", req.Username).First(&user).Error
+	destinationServer, err := NewDestinationServer(store, config)
 	if err != nil {
-		return nil, err
+		log.Fatal("Can not create server: ", err)
 	}
 
-	if err := util.CheckPassword(req.Password, user.HashedPassword); err != nil {
-		return nil, err
+	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames: true,
+		},
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	})
+
+	grpcMux := runtime.NewServeMux(jsonOption)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err = pb.RegisterAuthServiceHandlerServer(ctx, grpcMux, authServer); err != nil {
+		log.Fatal("Can not register gateway server: ", err)
 	}
 
-	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration, server.config.AccessTokenPrivateKey)
+	if err = pb.RegisterDestinationServiceHandlerServer(ctx, grpcMux, destinationServer); err != nil {
+		log.Fatal("Can not register gateway server: ", err)
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/", grpcMux)
+
+	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
-		return nil, err
+		log.Fatal("Can not start server: ", err)
 	}
 
-	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, server.config.RefreshTokenPrivateKey)
+	log.Println("Starting gateway server on", ":8080")
+
+	err = http.Serve(listener, mux)
 	if err != nil {
-		return nil, err
+		log.Fatal("Can not start server: ", err)
 	}
-
-	session := dto.UserSessionParams{
-		ID:           refreshPayload.ID,
-		Username:     user.Username,
-		RefreshToken: refreshToken,
-		UserAgent:    "",
-		ClientIp:     "",
-		IsBlocked:    false,
-		ExpiresAt:    refreshPayload.ExpiredAt,
-	}
-
-	if err := server.store.Create(&session).Error; err != nil {
-		return nil, err
-	}
-
-	rsp := pb.LoginResponse{
-		User:                  convertUser(user),
-		SessionId:             session.ID.String(),
-		AccessToken:           accessToken,
-		RefreshToken:          refreshToken,
-		AccessTokenExpiresAt:  timestamppb.New(accessPayload.ExpiredAt),
-		RefreshTokenExpiresAt: timestamppb.New(refreshPayload.ExpiredAt),
-	}
-
-	return &rsp, nil
-}
-
-func (server *GRPCServer) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
-	hashedPassword, err := util.HashPassword(req.Password)
-	if err != nil {
-		return nil, err
-	}
-
-	user := model.User{
-		Username:       req.Username,
-		Email:          req.Email,
-		Phone:          req.Phone,
-		FullName:       req.FullName,
-		HashedPassword: hashedPassword,
-		Status:         true,
-		Role:           1,
-	}
-
-	if err := server.store.Create(&user).Error; err != nil {
-		return nil, err
-	}
-
-	return convertUser(user), nil
 }

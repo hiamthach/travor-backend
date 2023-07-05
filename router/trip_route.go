@@ -10,7 +10,7 @@ import (
 func tripRoutes(router *gin.RouterGroup) {
 	trips := router.Group("/trips")
 
-	trips.Use(middleware.AuthMiddleware(TokenMaker))
+	trips.Use(middleware.AuthMiddleware())
 	{
 		trips.GET("/", controller.GetTrips(db.DB))
 		trips.GET("/:id", controller.GetTripById(db.DB))
