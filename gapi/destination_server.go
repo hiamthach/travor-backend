@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/travor-backend/constant"
+	"github.com/travor-backend/db"
 	"github.com/travor-backend/interceptor"
 	"github.com/travor-backend/pb"
 	"github.com/travor-backend/util"
@@ -17,8 +18,12 @@ type DestinationServer struct {
 	pb.UnimplementedDestinationServiceServer
 }
 
-func NewDestinationServer(store *gorm.DB, config util.Config) (*DestinationServer, error) {
-	return &DestinationServer{store: store, config: config}, nil
+func NewDestinationServer(config util.Config) (*DestinationServer, error) {
+	desDb, err := db.Connect(config.GetDBSource(constant.DESTINATION_DB))
+	if err != nil {
+		return nil, err
+	}
+	return &DestinationServer{store: desDb, config: config}, nil
 }
 
 func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.GetDestinationsRequest) (*pb.GetDestinationsResponse, error) {
@@ -35,7 +40,7 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 
 func (server *DestinationServer) CreateDestination(ctx context.Context, req *pb.CreateDestinationRequest) (*pb.CreateDestinationResponse, error) {
 	// Add admin interceptor
-	c, err := interceptor.AdminInterceptor(ctx, server.store)
+	c, err := interceptor.AdminInterceptor(ctx)
 	if err != nil {
 		return nil, err
 	}

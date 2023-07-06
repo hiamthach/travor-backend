@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/travor-backend/constant"
+	"github.com/travor-backend/db"
 
 	"github.com/travor-backend/dto"
 	"github.com/travor-backend/interceptor"
@@ -20,8 +21,13 @@ type AuthServer struct {
 	pb.UnimplementedAuthServiceServer
 }
 
-func NewAuthServer(store *gorm.DB, config util.Config) (*AuthServer, error) {
-	return &AuthServer{store: store, config: config}, nil
+func NewAuthServer(config util.Config) (*AuthServer, error) {
+	userdb, err := db.Connect(config.GetDBSource(constant.USER_DB))
+	if err != nil {
+		return nil, err
+	}
+
+	return &AuthServer{store: userdb, config: config}, nil
 }
 
 func (server *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
@@ -36,12 +42,12 @@ func (server *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.
 		return nil, err
 	}
 
-	accessToken, accessPayload, err := util.CreateToken(user.Username, server.config.AccessTokenDuration, server.config.AccessTokenPrivateKey)
+	accessToken, accessPayload, err := util.CreateToken(user.Username, server.config.AccessTokenDuration, server.config.AccessTokenPrivateKey, user.Role)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, refreshPayload, err := util.CreateToken(user.Username, server.config.RefreshTokenDuration, server.config.RefreshTokenPrivateKey)
+	refreshToken, refreshPayload, err := util.CreateToken(user.Username, server.config.RefreshTokenDuration, server.config.RefreshTokenPrivateKey, user.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +120,12 @@ func (server *AuthServer) RenewToken(ctx context.Context, req *pb.RenewTokenRequ
 		return nil, err
 	}
 
-	accessToken, accessPayload, err := util.CreateToken(session.Username, server.config.AccessTokenDuration, server.config.AccessTokenPrivateKey)
+	var user model.User
+	if err := server.store.Where("username = ?", session.Username).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	accessToken, accessPayload, err := util.CreateToken(session.Username, server.config.AccessTokenDuration, server.config.AccessTokenPrivateKey, user.Role)
 	if err != nil {
 		return nil, err
 	}

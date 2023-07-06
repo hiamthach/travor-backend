@@ -7,7 +7,6 @@ import (
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/travor-backend/constant"
 	"github.com/travor-backend/util"
-	"gorm.io/gorm"
 )
 
 func AuthInterceptor(ctx context.Context) (context.Context, error) {
@@ -31,7 +30,7 @@ func AuthInterceptor(ctx context.Context) (context.Context, error) {
 	return newCtx, nil
 }
 
-func AdminInterceptor(ctx context.Context, db *gorm.DB) (context.Context, error) {
+func AdminInterceptor(ctx context.Context) (context.Context, error) {
 	//Check the token
 	c, err := AuthInterceptor(ctx)
 	if err != nil {
@@ -40,13 +39,7 @@ func AdminInterceptor(ctx context.Context, db *gorm.DB) (context.Context, error)
 
 	payload := c.Value(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
 
-	var role int
-
-	if err := db.Table("users").Select("role").Where("username = ?", payload.Username).Scan(&role).Error; err != nil {
-		return nil, err
-	}
-
-	if role != constant.ADMIN_ROLE {
+	if payload.RoleID != constant.ADMIN_ROLE {
 		err := errors.New("no permission")
 		return nil, err
 	}
