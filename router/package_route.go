@@ -14,7 +14,7 @@ func packageRoutes(router *gin.RouterGroup) {
 		packages.GET("/", controller.GetPackages(db.DB))
 		packages.GET("/:id", controller.GetPackageById(db.DB))
 		// middleware with auth and admin
-		packages.Use(middleware.AuthMiddleware(TokenMaker))
+		packages.Use(middleware.AuthMiddleware())
 		packages.Use(middleware.AdminMiddleware(db.DB))
 		packages.POST("/", controller.CreatePackage(db.DB))
 		packages.PUT("/:id", controller.UpdatePackage(db.DB))

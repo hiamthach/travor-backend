@@ -137,15 +137,15 @@ func CreatePackage(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Package ID"
-// @Param body body dto.PackageRequestBody true "Updated package object"
-// @Success 200 {object} dto.PackageRequestBody
+// @Param body body dto.PackageRequestUpdateBody true "Updated package object"
+// @Success 200 {object} model.SuccessResponse
 // @Failure 400 {object} model.ErrorResponse
 // @Failure 404 {object} model.ErrorResponse
 // @Failure 500 {object} model.ErrorResponse
 // @Router /packages/{id} [put]
 func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var body dto.PackageRequestBody
+		var body dto.PackageRequestUpdateBody
 		idStr := ctx.Param("id")
 		id, err := strconv.ParseUint(idStr, 10, 64)
 		if err != nil {
@@ -153,7 +153,6 @@ func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		body.ID = id
 		if err = ctx.ShouldBindJSON(&body); err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
@@ -166,7 +165,7 @@ func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		packageUpdated = model.Package{
-			ID:           body.ID,
+			ID:           id,
 			Name:         body.Name,
 			Details:      body.Details,
 			Price:        body.Price,
@@ -176,7 +175,7 @@ func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 			NumberPeople: body.NumberPeople,
 		}
 
-		if err := db.Save(&packageUpdated).Error; err != nil {
+		if err := db.Model(&model.Package{}).Where("id = ?", id).Updates(&packageUpdated).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(err))
 			return
 		}
@@ -198,7 +197,7 @@ func UpdatePackage(db *gorm.DB) gin.HandlerFunc {
 			}
 		}
 
-		ctx.JSON(http.StatusOK, body)
+		ctx.JSON(http.StatusOK, util.SuccessResponse("Package updated successfully", nil))
 	}
 }
 

@@ -41,3 +41,17 @@ type PackageRequestBody struct {
 	} `json:"types"`
 	PackageTable
 }
+
+type PackageRequestUpdateBody struct {
+	Name         string `json:"name"`
+	Details      string `json:"details"`
+	Price        int    `json:"price"`
+	DesID        uint64 `json:"des_id"`
+	ImgURL       string `json:"img_url"`
+	Duration     string `json:"duration"`
+	NumberPeople int    `json:"number_people"`
+	Types        []struct {
+		ID uint64 `json:"id"`
+	} `json:"types"`
+	PackageTable
+}

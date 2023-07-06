@@ -109,29 +109,29 @@ func CreateDestination(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param Authorization header string true "Bearer {access_token}" default(Bearer <access_token>)
 // @Param id path int true "Destination ID"
-// @Param destination body dto.DestinationRequestBody true "Updated destination object"
-// @Success 200 {object} dto.DestinationRequestBody
+// @Param destination body dto.DestinationRequestUpdateBody true "Updated destination object"
+// @Success 200 {object} model.SuccessResponse
 // @Failure 400 {object} model.ErrorResponse
 // @Failure 404 {object} model.ErrorResponse
 // @Failure 500 {object} model.ErrorResponse
 // @Router /destinations/{id} [put]
 func UpdateDestination(db *gorm.DB) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var destination dto.DestinationRequestBody
+		var destination dto.DestinationRequestUpdateBody
 		idStr := ctx.Param("id")
 		id, err := strconv.ParseUint(idStr, 10, 64)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
-		destination.ID = id
+
 		err = ctx.ShouldBindJSON(&destination)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, util.ErrorResponse(err))
 			return
 		}
 
-		result := db.Model(&dto.DestinationRequestBody{}).Where("id = ?", id).Updates(&destination)
+		result := db.Model(&dto.DestinationRequestUpdateBody{}).Where("id = ?", id).Updates(&destination)
 		if result.Error != nil {
 			ctx.JSON(http.StatusInternalServerError, util.ErrorResponse(result.Error))
 			return
@@ -143,7 +143,7 @@ func UpdateDestination(db *gorm.DB) gin.HandlerFunc {
 			ctx.JSON(http.StatusNotFound, util.ErrorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusOK, destination)
+		ctx.JSON(http.StatusOK, util.SuccessResponse("Destination updated successfully", nil))
 	}
 }
 

@@ -1,13 +1,13 @@
 package util
 
 import (
+	"encoding/base64"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
@@ -44,82 +44,69 @@ func (payload *Payload) Valid() error {
 	return nil
 }
 
-type Maker interface {
-	CreateToken(username string, duration time.Duration) (string, *Payload, error)
-
-	VerifyToken(token string) (*Payload, error)
-}
-
-const minSecretKeySize = 32
-
-type JWTMaker struct {
-	secretKey string
-}
-
-func NewJWTMaker(secretKey string) (Maker, error) {
-	if len(secretKey) < minSecretKeySize {
-		return nil, fmt.Errorf("invalid key size: must be at least %d characters", minSecretKeySize)
-	}
-
-	return &JWTMaker{secretKey}, nil
-}
-
-func (maker *JWTMaker) CreateToken(username string, duration time.Duration) (string, *Payload, error) {
+func CreateToken(username string, duration time.Duration, privateKey string) (string, *Payload, error) {
+	now := time.Now().UTC()
 	payload, err := NewPayload(username, duration)
 	if err != nil {
 		return "", payload, nil
 	}
 
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
+	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
+	if err != nil {
+		return "", payload, err
+	}
 
-	token, err := jwtToken.SignedString([]byte(maker.secretKey))
+	key, err := jwt.ParseRSAPrivateKeyFromPEM(decodedPrivateKey)
+	if err != nil {
+		return "", payload, err
+	}
+
+	atClaims := make(jwt.MapClaims)
+	atClaims["sub"] = username
+	atClaims["token_uuid"] = payload.ID
+	atClaims["exp"] = payload.ExpiredAt.Unix()
+	atClaims["iat"] = now.Unix()
+	atClaims["nbf"] = now.Unix()
+
+	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, atClaims).SignedString(key)
+	if err != nil {
+		return "", payload, err
+	}
 
 	return token, payload, err
 }
 
-func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
-	keyFunc := func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-		if !ok {
+func VerifyToken(token string, publicKey string) (*Payload, error) {
+	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := jwt.ParseRSAPublicKeyFromPEM(decodedPublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, ErrInvalidToken
 		}
-		return []byte(maker.secretKey), nil
+
+		return key, nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	jwtToken, err := jwt.ParseWithClaims(token, &Payload{}, keyFunc)
-	if err != nil {
-		verr, ok := err.(*jwt.ValidationError)
-		if ok && errors.Is(verr.Inner, ErrExpiredToken) {
-			return nil, ErrExpiredToken
-		}
+	payload, ok := jwtToken.Claims.(jwt.MapClaims)
+	if !ok || !jwtToken.Valid {
 		return nil, ErrInvalidToken
 	}
 
-	payload, ok := jwtToken.Claims.(*Payload)
-	if !ok {
-		return nil, ErrInvalidToken
-	}
-
-	return payload, nil
-}
-
-func (maker *JWTMaker) RenewToken(refreshToken string, accessTokenDuration, refreshTokenDuration time.Duration) (string, *Payload, error) {
-	// Verify and parse the refresh token
-	refreshPayload, err := maker.VerifyToken(refreshToken)
-	if err != nil {
-		return "", nil, err
-	}
-
-	// Check if the refresh token has expired
-	if err := refreshPayload.Valid(); err != nil {
-		return "", nil, err
-	}
-
-	// Create a new access token using the same username and a new duration
-	newAccessToken, _, err := maker.CreateToken(refreshPayload.Username, accessTokenDuration)
-	if err != nil {
-		return "", nil, err
-	}
-
-	return newAccessToken, refreshPayload, nil
+	return &Payload{
+		ID:        uuid.MustParse(payload["token_uuid"].(string)),
+		Username:  payload["sub"].(string),
+		IssueAt:   time.Unix(int64(payload["iat"].(float64)), 0),
+		ExpiredAt: time.Unix(int64(payload["exp"].(float64)), 0),
+	}, nil
 }
