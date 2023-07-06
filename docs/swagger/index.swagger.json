@@ -181,10 +181,81 @@
         "tags": [
           "DestinationService"
         ]
+      },
+      "post": {
+        "operationId": "DestinationService_CreateDestination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateDestinationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DestinationService"
+        ]
       }
     }
   },
   "definitions": {
+    "pbCreateDestinationRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "country": {
+          "type": "string"
+        },
+        "visaRequire": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "area": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "$ref": "#/definitions/pbDestination"
+        }
+      }
+    },
     "pbCreateUserRequest": {
       "type": "object",
       "properties": {

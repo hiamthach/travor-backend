@@ -77,12 +77,12 @@ func RunGatewayServer(config util.Config, store *gorm.DB) {
 	mux := http.NewServeMux()
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", grpcMux))
 
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", config.ServerAddress)
 	if err != nil {
 		log.Fatal("Can not start server: ", err)
 	}
 
-	log.Println("Starting gateway server on", ":8080")
+	log.Println("Starting gateway server on", config.ServerAddress)
 
 	err = http.Serve(listener, mux)
 	if err != nil {

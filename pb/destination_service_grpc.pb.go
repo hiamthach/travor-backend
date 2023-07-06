@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	DestinationService_GetDestinations_FullMethodName = "/pb.DestinationService/GetDestinations"
+	DestinationService_GetDestinations_FullMethodName   = "/pb.DestinationService/GetDestinations"
+	DestinationService_CreateDestination_FullMethodName = "/pb.DestinationService/CreateDestination"
 )
 
 // DestinationServiceClient is the client API for DestinationService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DestinationServiceClient interface {
 	GetDestinations(ctx context.Context, in *GetDestinationsRequest, opts ...grpc.CallOption) (*GetDestinationsResponse, error)
+	CreateDestination(ctx context.Context, in *CreateDestinationRequest, opts ...grpc.CallOption) (*CreateDestinationResponse, error)
 }
 
 type destinationServiceClient struct {
@@ -46,11 +48,21 @@ func (c *destinationServiceClient) GetDestinations(ctx context.Context, in *GetD
 	return out, nil
 }
 
+func (c *destinationServiceClient) CreateDestination(ctx context.Context, in *CreateDestinationRequest, opts ...grpc.CallOption) (*CreateDestinationResponse, error) {
+	out := new(CreateDestinationResponse)
+	err := c.cc.Invoke(ctx, DestinationService_CreateDestination_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DestinationServiceServer is the server API for DestinationService service.
 // All implementations must embed UnimplementedDestinationServiceServer
 // for forward compatibility
 type DestinationServiceServer interface {
 	GetDestinations(context.Context, *GetDestinationsRequest) (*GetDestinationsResponse, error)
+	CreateDestination(context.Context, *CreateDestinationRequest) (*CreateDestinationResponse, error)
 	mustEmbedUnimplementedDestinationServiceServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedDestinationServiceServer struct {
 
 func (UnimplementedDestinationServiceServer) GetDestinations(context.Context, *GetDestinationsRequest) (*GetDestinationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDestinations not implemented")
+}
+func (UnimplementedDestinationServiceServer) CreateDestination(context.Context, *CreateDestinationRequest) (*CreateDestinationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDestination not implemented")
 }
 func (UnimplementedDestinationServiceServer) mustEmbedUnimplementedDestinationServiceServer() {}
 
@@ -92,6 +107,24 @@ func _DestinationService_GetDestinations_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DestinationService_CreateDestination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDestinationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DestinationServiceServer).CreateDestination(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DestinationService_CreateDestination_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DestinationServiceServer).CreateDestination(ctx, req.(*CreateDestinationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DestinationService_ServiceDesc is the grpc.ServiceDesc for DestinationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var DestinationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDestinations",
 			Handler:    _DestinationService_GetDestinations_Handler,
+		},
+		{
+			MethodName: "CreateDestination",
+			Handler:    _DestinationService_CreateDestination_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -2,7 +2,10 @@ package gapi
 
 import (
 	"context"
+	"errors"
 
+	"github.com/travor-backend/constant"
+	"github.com/travor-backend/interceptor"
 	"github.com/travor-backend/pb"
 	"github.com/travor-backend/util"
 	"gorm.io/gorm"
@@ -27,5 +30,38 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 
 	return &pb.GetDestinationsResponse{
 		Destinations: destinations,
+	}, nil
+}
+
+func (server *DestinationServer) CreateDestination(ctx context.Context, req *pb.CreateDestinationRequest) (*pb.CreateDestinationResponse, error) {
+	// Add admin interceptor
+	c, err := interceptor.AdminInterceptor(ctx, server.store)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := c.Value(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
+	if payload == nil {
+		return nil, errors.New("unauthorized")
+	}
+
+	destination := &pb.Destination{
+		Name:        req.Name,
+		Description: req.Description,
+		Location:    req.Location,
+		Price:       req.Price,
+		Language:    req.Language,
+		VisaRequire: req.VisaRequire,
+		Country:     req.Country,
+		Currency:    req.Currency,
+		Area:        req.Area,
+	}
+
+	if err := server.store.Create(&destination).Error; err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateDestinationResponse{
+		Destination: destination,
 	}, nil
 }

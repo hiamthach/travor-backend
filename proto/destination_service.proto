@@ -12,6 +12,13 @@ service DestinationService {
       get: "/destinations"
     };
   }
+
+  rpc CreateDestination(CreateDestinationRequest) returns (CreateDestinationResponse) {
+    option (google.api.http) = {
+      post: "/destinations"
+      body: "*"
+    };
+  }
 }
 
 message Destination {
@@ -34,4 +41,20 @@ message GetDestinationsRequest {
 
 message GetDestinationsResponse {
   repeated Destination destinations = 1;
+}
+
+message CreateDestinationRequest {
+  string name = 1;
+  string description = 2;
+  int32 price = 3;
+  string country = 4;
+  string visa_require = 5;
+  string language = 6;
+  string currency = 7;
+  string area = 8;
+  string location = 9;
+}
+
+message CreateDestinationResponse {
+  Destination destination = 1;
 }
