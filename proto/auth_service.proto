@@ -34,6 +34,13 @@ service AuthService {
       body: "*"
     };
   }
+
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (google.api.http) = {
+      post: "/auth/change-password"
+      body: "*"
+    };
+  }
 }
 
 message User {
@@ -79,4 +86,13 @@ message RenewTokenRequest {
 message RenewTokenResponse {
   string access_token = 1;
   google.protobuf.Timestamp access_token_expires_at = 2;
+}
+
+message ChangePasswordRequest {
+  string old_password = 1;
+  string new_password = 2;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
 }

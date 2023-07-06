@@ -3,7 +3,10 @@ package gapi
 import (
 	"context"
 
+	"github.com/travor-backend/constant"
+
 	"github.com/travor-backend/dto"
+	"github.com/travor-backend/interceptor"
 	"github.com/travor-backend/model"
 	"github.com/travor-backend/pb"
 	"github.com/travor-backend/util"
@@ -131,4 +134,36 @@ func (server *AuthServer) GetUser(ctx context.Context, req *pb.GetUserRequest) (
 	}
 
 	return convertUser(user), nil
+}
+
+func (server *AuthServer) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
+	c, err := interceptor.AuthInterceptor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := c.Value(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
+
+	var user model.User
+
+	if err := server.store.Where("username = ?", payload.Username).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	if err := util.CheckPassword(req.OldPassword, user.HashedPassword); err != nil {
+		return nil, err
+	}
+
+	hashedPassword, err := util.HashPassword(req.NewPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := server.store.Model(&user).Update("hashed_password", hashedPassword).Error; err != nil {
+		return nil, err
+	}
+
+	return &pb.ChangePasswordResponse{
+		Success: true,
+	}, nil
 }

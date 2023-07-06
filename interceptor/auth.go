@@ -16,6 +16,7 @@ func AuthInterceptor(ctx context.Context) (context.Context, error) {
 		return nil, err
 	}
 
+	// Get the token from the request header "Authorization"
 	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
 	if err != nil {
 		return nil, err
@@ -31,6 +32,7 @@ func AuthInterceptor(ctx context.Context) (context.Context, error) {
 }
 
 func AdminInterceptor(ctx context.Context, db *gorm.DB) (context.Context, error) {
+	//Check the token
 	c, err := AuthInterceptor(ctx)
 	if err != nil {
 		return nil, err
