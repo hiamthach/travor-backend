@@ -2,18 +2,25 @@ package util
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/travor-backend/db"
 )
 
 type RedisUtil struct {
 	redisClient *redis.Client
 }
 
-func NewRedisUtil() (*RedisUtil, error) {
-	redisClient := db.GetRedisClient()
+func NewRedisUtil(config Config) (*RedisUtil, error) {
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     config.RedisUrl,
+		Password: config.RedisPassword,
+		Username: config.RedisUsername,
+		DB:       0,
+	})
+
+	log.Println("Redis client connected successfully...")
 
 	_, err := redisClient.Ping(context.Background()).Result()
 	if err != nil {
