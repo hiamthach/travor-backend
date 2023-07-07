@@ -13,7 +13,7 @@ func galleryRoutes(router *gin.RouterGroup) {
 	{
 		galleries.GET("/:des", controller.GetGalleriesByDesID(db.DB))
 		// middleware with auth and admin
-		galleries.Use(middleware.AuthMiddleware(TokenMaker))
+		galleries.Use(middleware.AuthMiddleware())
 		galleries.Use(middleware.AdminMiddleware(db.DB))
 		galleries.POST("/upload/:des", controller.UploadToGallery(db.DB))
 		// galleries.POST("/:id", controller.UpdateGallery(db.DB))

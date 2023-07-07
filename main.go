@@ -3,8 +3,9 @@ package main
 import (
 	"log"
 
+	"github.com/travor-backend/db"
 	_ "github.com/travor-backend/docs"
-	"github.com/travor-backend/router"
+	"github.com/travor-backend/gapi"
 	"github.com/travor-backend/util"
 )
 
@@ -17,14 +18,17 @@ func main() {
 	if err != nil {
 		log.Fatal("Can not load config: ", err)
 	}
-
-	server, err := router.NewServer(config)
+	_, err = db.GetInstance(config.DBSource)
 	if err != nil {
-		log.Fatal("Can not create server: ", err)
+		log.Fatal("Can not connect to database: ", err)
 	}
 
-	err = server.Start(config.ServerAddress)
+	redisUtil, err := util.NewRedisUtil(config)
 	if err != nil {
-		log.Fatal("Can not start server: ", err)
+		log.Fatal("Can not connect to redis: ", err)
 	}
+
+	// Run gRPC Server
+	go gapi.RunGatewayServer(config, db.DB, *redisUtil)
+	gapi.RunGRPCServer(config, db.DB, *redisUtil)
 }

@@ -11,8 +11,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func AuthMiddleware(token util.Maker) gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		config, err := util.LoadConfig(".")
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, err)
+			return
+		}
 		authorizationHeader := ctx.GetHeader(constant.AUTHORIZATION_HEADER_KEY)
 
 		if len(authorizationHeader) == 0 {
@@ -38,7 +43,7 @@ func AuthMiddleware(token util.Maker) gin.HandlerFunc {
 
 		accessToken := fields[1]
 
-		payload, err := token.VerifyToken(accessToken)
+		payload, err := util.VerifyToken(accessToken, config.AccessTokenPublicKey)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err)
 			return

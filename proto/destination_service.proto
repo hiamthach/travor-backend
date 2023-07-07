@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/travor-backend/pb";
+
+service DestinationService {
+  rpc GetDestinations(GetDestinationsRequest) returns (GetDestinationsResponse) {
+    option (google.api.http) = {
+      get: "/destinations"
+    };
+  }
+
+  rpc GetDestinationById(GetDestinationByIdRequest) returns (Destination) {
+    option (google.api.http) = {
+      get: "/destinations/{id}"
+    };
+  }
+
+  rpc CreateDestination(CreateDestinationRequest) returns (CreateDestinationResponse) {
+    option (google.api.http) = {
+      post: "/destinations"
+      body: "*"
+    };
+  }
+
+  rpc UpdateDestination(UpdateDestinationRequest) returns (UpdateDestinationResponse) {
+    option (google.api.http) = {
+      put: "/destinations/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteDestination(DeleteDestinationRequest) returns (DeleteDestinationResponse) {
+    option (google.api.http) = {
+      delete: "/destinations/{id}"
+    };
+  }
+}
+
+message Destination {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string country = 5;
+  string visa_require = 6;
+  string language = 7;
+  string currency = 8;
+  string area = 9;
+  string location = 10;
+}
+
+message GetDestinationsRequest {
+  uint32 page = 1;
+  uint32 page_size = 2;
+}
+
+message GetDestinationByIdRequest {
+  uint64 id = 1;
+}
+
+message GetDestinationsResponse {
+  repeated Destination destinations = 1;
+}
+
+message CreateDestinationRequest {
+  string name = 1;
+  string description = 2;
+  int32 price = 3;
+  string country = 4;
+  string visa_require = 5;
+  string language = 6;
+  string currency = 7;
+  string area = 8;
+  string location = 9;
+}
+
+message CreateDestinationResponse {
+  Destination destination = 1;
+}
+
+message UpdateDestinationRequest {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string country = 5;
+  string visa_require = 6;
+  string language = 7;
+  string currency = 8;
+  string area = 9;
+  string location = 10;
+}
+
+message UpdateDestinationResponse {
+  Destination destination = 1;
+}
+
+message DeleteDestinationRequest {
+  uint64 id = 1;
+}
+
+message DeleteDestinationResponse {
+  bool success = 1;
+}

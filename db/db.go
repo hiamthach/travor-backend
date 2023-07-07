@@ -21,3 +21,12 @@ func GetInstance(path string) (*gorm.DB, error) {
 	})
 	return DB, nil
 }
+
+func Connect(path string) (*gorm.DB, error) {
+	mydb, err := gorm.Open(postgres.Open(path), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+
+	return mydb, nil
+}
