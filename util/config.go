@@ -9,6 +9,10 @@ import (
 type Config struct {
 	DBDriver               string        `mapstructure:"DB_DRIVER" env:"DB_DRIVER"`
 	DBSource               string        `mapstructure:"DB_SOURCE" env:"DB_SOURCE"`
+	DBUrl                  string        `mapstructure:"DB_URL" env:"DB_URL"`
+	RedisUrl               string        `mapstructure:"REDIS_URL" env:"REDIS_URL"`
+	RedisPassword          string        `mapstructure:"REDIS_PASSWORD" env:"REDIS_PASSWORD"`
+	RedisUsername          string        `mapstructure:"REDIS_USERNAME" env:"REDIS_USERNAME"`
 	ServerAddress          string        `mapstructure:"SERVER_ADDRESS" env:"SERVER_ADDRESS"`
 	GRPCServerAddress      string        `mapstructure:"GRPC_SERVER_ADDRESS" env:"GRPC_SERVER_ADDRESS"`
 	TokenSymmetricKey      string        `mapstructure:"TOKEN_SYMMETRIC_KEY" env:"TOKEN_SYMMETRIC_KEY"`
@@ -35,4 +39,8 @@ func LoadConfig(path string) (config Config, err error) {
 
 	err = viper.Unmarshal(&config)
 	return
+}
+
+func (config *Config) GetDBSource(dbName string) string {
+	return config.DBUrl + dbName + "?sslmode=verify-full"
 }

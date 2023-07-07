@@ -23,20 +23,12 @@ func main() {
 		log.Fatal("Can not connect to database: ", err)
 	}
 
-	// Run Gin Server
-	// go func() {
-	// 	server, err := router.NewServer(config)
-	// 	if err != nil {
-	// 		log.Fatal("Can not create server: ", err)
-	// 	}
-
-	// 	err = server.Start(config.ServerAddress)
-	// 	if err != nil {
-	// 		log.Fatal("Can not start server: ", err)
-	// 	}
-	// }()
+	redisUtil, err := util.NewRedisUtil(config)
+	if err != nil {
+		log.Fatal("Can not connect to redis: ", err)
+	}
 
 	// Run gRPC Server
-	go gapi.RunGatewayServer(config, db.DB)
-	gapi.RunGRPCServer(config, db.DB)
+	go gapi.RunGatewayServer(config, db.DB, *redisUtil)
+	gapi.RunGRPCServer(config, db.DB, *redisUtil)
 }

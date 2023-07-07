@@ -18,6 +18,7 @@ var (
 type Payload struct {
 	ID        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`
+	RoleID    int       `json:"role_id"`
 	IssueAt   time.Time `json:"issue_at"`
 	ExpiredAt time.Time `json:"expired_at"`
 }
@@ -44,7 +45,7 @@ func (payload *Payload) Valid() error {
 	return nil
 }
 
-func CreateToken(username string, duration time.Duration, privateKey string) (string, *Payload, error) {
+func CreateToken(username string, duration time.Duration, privateKey string, roleId int) (string, *Payload, error) {
 	now := time.Now().UTC()
 	payload, err := NewPayload(username, duration)
 	if err != nil {
@@ -62,6 +63,7 @@ func CreateToken(username string, duration time.Duration, privateKey string) (st
 	}
 
 	atClaims := make(jwt.MapClaims)
+	atClaims["role_id"] = roleId
 	atClaims["sub"] = username
 	atClaims["token_uuid"] = payload.ID
 	atClaims["exp"] = payload.ExpiredAt.Unix()

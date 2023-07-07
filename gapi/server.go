@@ -14,20 +14,21 @@ import (
 	"gorm.io/gorm"
 )
 
-func RunGRPCServer(config util.Config, store *gorm.DB) {
-	authServer, err := NewAuthServer(store, config)
-	if err != nil {
-		log.Fatal("Can not create server: ", err)
-	}
-
-	destinationServer, err := NewDestinationServer(store, config)
-	if err != nil {
-		log.Fatal("Can not create server: ", err)
-	}
-
+func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 	grpcServer := grpc.NewServer()
 
+	authServer, err := NewAuthServer(config)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
 	pb.RegisterAuthServiceServer(grpcServer, authServer)
+
+	destinationServer, err := NewDestinationServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
 	pb.RegisterDestinationServiceServer(grpcServer, destinationServer)
 
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
@@ -42,12 +43,12 @@ func RunGRPCServer(config util.Config, store *gorm.DB) {
 	}
 }
 
-func RunGatewayServer(config util.Config, store *gorm.DB) {
-	authServer, err := NewAuthServer(store, config)
+func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
+	authServer, err := NewAuthServer(config)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
-	destinationServer, err := NewDestinationServer(store, config)
+	destinationServer, err := NewDestinationServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
