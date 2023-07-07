@@ -43,7 +43,6 @@ func (server *Server) setupRouter() {
 	api := router.Group("/api/v1")
 
 	{
-		destinationRoutes(api)
 		packageRoutes(api)
 		typeRoutes(api)
 		galleryRoutes(api)
