@@ -244,6 +244,133 @@
           "DestinationService"
         ]
       }
+    },
+    "/destinations/{id}": {
+      "get": {
+        "operationId": "DestinationService_GetDestinationById",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDestination"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "DestinationService"
+        ]
+      },
+      "delete": {
+        "operationId": "DestinationService_DeleteDestination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeleteDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "DestinationService"
+        ]
+      },
+      "put": {
+        "operationId": "DestinationService_UpdateDestination",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdateDestinationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "country": {
+                  "type": "string"
+                },
+                "visaRequire": {
+                  "type": "string"
+                },
+                "language": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "area": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "DestinationService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -324,6 +451,14 @@
         },
         "password": {
           "type": "string"
+        }
+      }
+    },
+    "pbDeleteDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
         }
       }
     },
@@ -429,6 +564,14 @@
         "accessTokenExpiresAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "pbUpdateDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "$ref": "#/definitions/pbDestination"
         }
       }
     },

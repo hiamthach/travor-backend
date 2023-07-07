@@ -13,10 +13,29 @@ service DestinationService {
     };
   }
 
+  rpc GetDestinationById(GetDestinationByIdRequest) returns (Destination) {
+    option (google.api.http) = {
+      get: "/destinations/{id}"
+    };
+  }
+
   rpc CreateDestination(CreateDestinationRequest) returns (CreateDestinationResponse) {
     option (google.api.http) = {
       post: "/destinations"
       body: "*"
+    };
+  }
+
+  rpc UpdateDestination(UpdateDestinationRequest) returns (UpdateDestinationResponse) {
+    option (google.api.http) = {
+      put: "/destinations/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteDestination(DeleteDestinationRequest) returns (DeleteDestinationResponse) {
+    option (google.api.http) = {
+      delete: "/destinations/{id}"
     };
   }
 }
@@ -39,6 +58,10 @@ message GetDestinationsRequest {
   uint32 page_size = 2;
 }
 
+message GetDestinationByIdRequest {
+  uint64 id = 1;
+}
+
 message GetDestinationsResponse {
   repeated Destination destinations = 1;
 }
@@ -57,4 +80,29 @@ message CreateDestinationRequest {
 
 message CreateDestinationResponse {
   Destination destination = 1;
+}
+
+message UpdateDestinationRequest {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 price = 4;
+  string country = 5;
+  string visa_require = 6;
+  string language = 7;
+  string currency = 8;
+  string area = 9;
+  string location = 10;
+}
+
+message UpdateDestinationResponse {
+  Destination destination = 1;
+}
+
+message DeleteDestinationRequest {
+  uint64 id = 1;
+}
+
+message DeleteDestinationResponse {
+  bool success = 1;
 }
