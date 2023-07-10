@@ -12,6 +12,9 @@
       "name": "DestinationService"
     },
     {
+      "name": "GalleryService"
+    },
+    {
       "name": "PackageService"
     },
     {
@@ -378,6 +381,100 @@
         ]
       }
     },
+    "/galleries": {
+      "post": {
+        "operationId": "GalleryService_AddImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbAddImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbAddImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GalleryService"
+        ]
+      }
+    },
+    "/galleries/{desId}": {
+      "get": {
+        "operationId": "GalleryService_GetImages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetImagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "desId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "GalleryService"
+        ]
+      }
+    },
+    "/galleries/{id}": {
+      "delete": {
+        "operationId": "GalleryService_DeleteImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeleteImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "GalleryService"
+        ]
+      }
+    },
     "/packages": {
       "get": {
         "operationId": "PackageService_GetPackages",
@@ -660,6 +757,26 @@
     }
   },
   "definitions": {
+    "pbAddImageRequest": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "desId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "pbAddImageResponse": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "$ref": "#/definitions/pbImage"
+        }
+      }
+    },
     "pbChangePasswordRequest": {
       "type": "object",
       "properties": {
@@ -800,6 +917,14 @@
         }
       }
     },
+    "pbDeleteImageResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
     "pbDeletePackageResponse": {
       "type": "object",
       "properties": {
@@ -865,6 +990,18 @@
         }
       }
     },
+    "pbGetImagesResponse": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbImage"
+          }
+        }
+      }
+    },
     "pbGetPackagesResponse": {
       "type": "object",
       "properties": {
@@ -889,6 +1026,22 @@
             "type": "object",
             "$ref": "#/definitions/pbType"
           }
+        }
+      }
+    },
+    "pbImage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        },
+        "desId": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

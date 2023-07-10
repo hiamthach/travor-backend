@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/travor-backend/pb";
+
+service GalleryService {
+  rpc AddImage(AddImageRequest) returns (AddImageResponse) {
+    option (google.api.http) = {
+      post: "/galleries"
+      body: "*"
+    };
+  }
+
+  rpc GetImages(GetImagesRequest) returns (GetImagesResponse) {
+    option (google.api.http) = {
+      get: "/galleries/{desId}"
+    };
+  }
+
+  rpc DeleteImage(DeleteImageRequest) returns (DeleteImageResponse) {
+    option (google.api.http) = {
+      delete: "/galleries/{id}"
+    };
+  }
+}
+
+message Image {
+  int64 id = 1;
+  string url = 2;
+  int32  desId = 3;
+}
+
+message AddImageRequest {
+  string url = 1;
+  int32  desId = 2;
+}
+
+message AddImageResponse {
+  Image image = 1;
+}
+
+message GetImagesRequest {
+  int32 desId = 1;
+}
+
+message GetImagesResponse {
+  repeated Image images = 1;
+}
+
+message DeleteImageRequest {
+  int64 id = 1;
+}
+
+message DeleteImageResponse {
+  bool success = 1;
+}
