@@ -31,6 +31,13 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 
 	pb.RegisterDestinationServiceServer(grpcServer, destinationServer)
 
+	typeServer, err := NewTypeServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	pb.RegisterTypeServiceServer(grpcServer, typeServer)
+
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
 		log.Fatal("Can not start server: ", err)
@@ -44,11 +51,17 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 }
 
 func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
+	// initialize grpc server
 	authServer, err := NewAuthServer(config)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
 	destinationServer, err := NewDestinationServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	typeServer, err := NewTypeServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
@@ -62,16 +75,22 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 		},
 	})
 
+	// initialize gateway server
 	grpcMux := runtime.NewServeMux(jsonOption)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// register gateway server
 	if err = pb.RegisterAuthServiceHandlerServer(ctx, grpcMux, authServer); err != nil {
 		log.Fatal("Can not register gateway server: ", err)
 	}
 
 	if err = pb.RegisterDestinationServiceHandlerServer(ctx, grpcMux, destinationServer); err != nil {
+		log.Fatal("Can not register gateway server: ", err)
+	}
+
+	if err = pb.RegisterTypeServiceHandlerServer(ctx, grpcMux, typeServer); err != nil {
 		log.Fatal("Can not register gateway server: ", err)
 	}
 
