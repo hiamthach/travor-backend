@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/travor-backend/db"
-	_ "github.com/travor-backend/docs"
 	"github.com/travor-backend/gapi"
 	"github.com/travor-backend/util"
 )

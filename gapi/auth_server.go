@@ -6,7 +6,6 @@ import (
 	"github.com/travor-backend/constant"
 	"github.com/travor-backend/db"
 
-	"github.com/travor-backend/dto"
 	"github.com/travor-backend/interceptor"
 	"github.com/travor-backend/model"
 	"github.com/travor-backend/pb"
@@ -52,7 +51,7 @@ func (server *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.
 		return nil, err
 	}
 
-	session := dto.UserSessionParams{
+	session := model.UserSessionParams{
 		ID:           refreshPayload.ID,
 		Username:     user.Username,
 		RefreshToken: refreshToken,
@@ -107,8 +106,8 @@ func (server *AuthServer) RenewToken(ctx context.Context, req *pb.RenewTokenRequ
 		return nil, err
 	}
 
-	var session dto.UserSessionParams
-	if err := server.store.Where("id = ?", refreshToken.ID).First(&session).Error; err != nil {
+	var session model.UserSessionParams
+	if err := server.store.Table("sessions").Where("id = ?", refreshToken.ID).First(&session).Error; err != nil {
 		return nil, err
 	}
 

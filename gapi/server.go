@@ -145,7 +145,7 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 
 	log.Println("Starting gateway server on", config.ServerAddress)
 
-	err = http.Serve(listener, mux)
+	err = http.Serve(listener, enableCors(mux))
 	if err != nil {
 		log.Fatal("Can not start server: ", err)
 	}
@@ -153,11 +153,8 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 
 // File upload func
 func handleBinaryFileUpload(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Upload file")
-
-	// Parse our multipart form, 10 << 20 specifies a maximum
-	// upload of 10 MB files.
-	r.ParseMultipartForm(10 << 20)
+	// upload of 5 MB files.
+	r.ParseMultipartForm(5 << 20)
 
 	file, handler, err := r.FormFile("image")
 	if err != nil {
@@ -175,4 +172,18 @@ func handleBinaryFileUpload(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf(`{"url": "%s"}`, url.MediaLink)))
+}
+
+// Enable CORS
+func enableCors(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, HEAD, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, X-CSRF-Token")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
 }
