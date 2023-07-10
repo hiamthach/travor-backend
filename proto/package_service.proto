@@ -20,6 +20,26 @@ service PackageService {
       get: "/packages/{id}"
     };
   }
+
+  rpc CreatePackage(CreatePackageReq) returns (Package) {
+    option (google.api.http) = {
+      post: "/packages"
+      body: "*"
+    };
+  }
+
+  rpc UpdatePackage(UpdatePackageReq) returns (Package) {
+    option (google.api.http) = {
+      put: "/packages/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeletePackage(PackageID) returns (DeletePackageResponse) {
+    option (google.api.http) = {
+      delete: "/packages/{id}"
+    };
+  }
 }
 
 message Package {
@@ -41,4 +61,31 @@ message GetPackagesResponse {
 
 message PackageID {
   uint64 id = 1;
+}
+
+message CreatePackageReq {
+  uint64 des_id = 1;
+  string name = 2;
+  string details = 3;
+  int32 price = 4;
+  string img_url = 5;
+  string duration = 6;
+  int32 number_people = 7;
+  repeated uint64 types = 8;
+}
+
+message UpdatePackageReq {
+  uint64 id = 1;
+  uint64 des_id = 2;
+  string name = 3;
+  string details = 4;
+  int32 price = 5;
+  string img_url = 6;
+  string duration = 7;
+  int32 number_people = 8;
+  repeated uint64 types = 9;
+}
+
+message DeletePackageResponse {
+  bool success = 1;
 }

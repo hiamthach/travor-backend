@@ -17,6 +17,7 @@ import (
 func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 	grpcServer := grpc.NewServer()
 
+	// Register auth server
 	authServer, err := NewAuthServer(config)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
@@ -24,6 +25,7 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 
 	pb.RegisterAuthServiceServer(grpcServer, authServer)
 
+	// Register destination server
 	destinationServer, err := NewDestinationServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
@@ -31,6 +33,7 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 
 	pb.RegisterDestinationServiceServer(grpcServer, destinationServer)
 
+	// Register type server
 	typeServer, err := NewTypeServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
@@ -38,6 +41,15 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 
 	pb.RegisterTypeServiceServer(grpcServer, typeServer)
 
+	// Register package server
+	packageServer, err := NewPackageServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	pb.RegisterPackageServiceServer(grpcServer, packageServer)
+
+	// Start server
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
 		log.Fatal("Can not start server: ", err)
@@ -62,6 +74,11 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 	}
 
 	typeServer, err := NewTypeServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	packageServer, err := NewPackageServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
@@ -94,6 +111,11 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 		log.Fatal("Can not register gateway server: ", err)
 	}
 
+	if err = pb.RegisterPackageServiceHandlerServer(ctx, grpcMux, packageServer); err != nil {
+		log.Fatal("Can not register gateway server: ", err)
+	}
+
+	// initialize http server
 	mux := http.NewServeMux()
 	mux.Handle("/api/v1/", http.StripPrefix("/api/v1", grpcMux))
 

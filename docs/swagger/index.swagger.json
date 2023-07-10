@@ -414,6 +414,36 @@
         "tags": [
           "PackageService"
         ]
+      },
+      "post": {
+        "operationId": "PackageService_CreatePackage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbPackage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreatePackageReq"
+            }
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
       }
     },
     "/packages/{id}": {
@@ -440,6 +470,105 @@
             "required": true,
             "type": "string",
             "format": "uint64"
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
+      },
+      "delete": {
+        "operationId": "PackageService_DeletePackage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeletePackageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
+      },
+      "put": {
+        "operationId": "PackageService_UpdatePackage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbPackage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "desId": {
+                  "type": "string",
+                  "format": "uint64"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "imgUrl": {
+                  "type": "string"
+                },
+                "duration": {
+                  "type": "string"
+                },
+                "numberPeople": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uint64"
+                  }
+                }
+              }
+            }
           }
         ],
         "tags": [
@@ -591,6 +720,42 @@
         }
       }
     },
+    "pbCreatePackageReq": {
+      "type": "object",
+      "properties": {
+        "desId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "imgUrl": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "numberPeople": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
     "pbCreateTypeRequest": {
       "type": "object",
       "properties": {
@@ -628,6 +793,14 @@
       }
     },
     "pbDeleteDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbDeletePackageResponse": {
       "type": "object",
       "properties": {
         "success": {

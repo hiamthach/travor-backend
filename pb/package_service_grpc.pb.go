@@ -19,8 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PackageService_GetPackages_FullMethodName = "/pb.PackageService/GetPackages"
-	PackageService_GetPackage_FullMethodName  = "/pb.PackageService/GetPackage"
+	PackageService_GetPackages_FullMethodName   = "/pb.PackageService/GetPackages"
+	PackageService_GetPackage_FullMethodName    = "/pb.PackageService/GetPackage"
+	PackageService_CreatePackage_FullMethodName = "/pb.PackageService/CreatePackage"
+	PackageService_UpdatePackage_FullMethodName = "/pb.PackageService/UpdatePackage"
+	PackageService_DeletePackage_FullMethodName = "/pb.PackageService/DeletePackage"
 )
 
 // PackageServiceClient is the client API for PackageService service.
@@ -29,6 +32,9 @@ const (
 type PackageServiceClient interface {
 	GetPackages(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*GetPackagesResponse, error)
 	GetPackage(ctx context.Context, in *PackageID, opts ...grpc.CallOption) (*Package, error)
+	CreatePackage(ctx context.Context, in *CreatePackageReq, opts ...grpc.CallOption) (*Package, error)
+	UpdatePackage(ctx context.Context, in *UpdatePackageReq, opts ...grpc.CallOption) (*Package, error)
+	DeletePackage(ctx context.Context, in *PackageID, opts ...grpc.CallOption) (*DeletePackageResponse, error)
 }
 
 type packageServiceClient struct {
@@ -57,12 +63,42 @@ func (c *packageServiceClient) GetPackage(ctx context.Context, in *PackageID, op
 	return out, nil
 }
 
+func (c *packageServiceClient) CreatePackage(ctx context.Context, in *CreatePackageReq, opts ...grpc.CallOption) (*Package, error) {
+	out := new(Package)
+	err := c.cc.Invoke(ctx, PackageService_CreatePackage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *packageServiceClient) UpdatePackage(ctx context.Context, in *UpdatePackageReq, opts ...grpc.CallOption) (*Package, error) {
+	out := new(Package)
+	err := c.cc.Invoke(ctx, PackageService_UpdatePackage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *packageServiceClient) DeletePackage(ctx context.Context, in *PackageID, opts ...grpc.CallOption) (*DeletePackageResponse, error) {
+	out := new(DeletePackageResponse)
+	err := c.cc.Invoke(ctx, PackageService_DeletePackage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PackageServiceServer is the server API for PackageService service.
 // All implementations must embed UnimplementedPackageServiceServer
 // for forward compatibility
 type PackageServiceServer interface {
 	GetPackages(context.Context, *Pagination) (*GetPackagesResponse, error)
 	GetPackage(context.Context, *PackageID) (*Package, error)
+	CreatePackage(context.Context, *CreatePackageReq) (*Package, error)
+	UpdatePackage(context.Context, *UpdatePackageReq) (*Package, error)
+	DeletePackage(context.Context, *PackageID) (*DeletePackageResponse, error)
 	mustEmbedUnimplementedPackageServiceServer()
 }
 
@@ -75,6 +111,15 @@ func (UnimplementedPackageServiceServer) GetPackages(context.Context, *Paginatio
 }
 func (UnimplementedPackageServiceServer) GetPackage(context.Context, *PackageID) (*Package, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPackage not implemented")
+}
+func (UnimplementedPackageServiceServer) CreatePackage(context.Context, *CreatePackageReq) (*Package, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePackage not implemented")
+}
+func (UnimplementedPackageServiceServer) UpdatePackage(context.Context, *UpdatePackageReq) (*Package, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePackage not implemented")
+}
+func (UnimplementedPackageServiceServer) DeletePackage(context.Context, *PackageID) (*DeletePackageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePackage not implemented")
 }
 func (UnimplementedPackageServiceServer) mustEmbedUnimplementedPackageServiceServer() {}
 
@@ -125,6 +170,60 @@ func _PackageService_GetPackage_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PackageService_CreatePackage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePackageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PackageServiceServer).CreatePackage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PackageService_CreatePackage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PackageServiceServer).CreatePackage(ctx, req.(*CreatePackageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PackageService_UpdatePackage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePackageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PackageServiceServer).UpdatePackage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PackageService_UpdatePackage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PackageServiceServer).UpdatePackage(ctx, req.(*UpdatePackageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PackageService_DeletePackage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PackageID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PackageServiceServer).DeletePackage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PackageService_DeletePackage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PackageServiceServer).DeletePackage(ctx, req.(*PackageID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PackageService_ServiceDesc is the grpc.ServiceDesc for PackageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +238,18 @@ var PackageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPackage",
 			Handler:    _PackageService_GetPackage_Handler,
+		},
+		{
+			MethodName: "CreatePackage",
+			Handler:    _PackageService_CreatePackage_Handler,
+		},
+		{
+			MethodName: "UpdatePackage",
+			Handler:    _PackageService_UpdatePackage_Handler,
+		},
+		{
+			MethodName: "DeletePackage",
+			Handler:    _PackageService_DeletePackage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
