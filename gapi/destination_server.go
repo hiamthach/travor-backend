@@ -60,11 +60,11 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 	// Serialize the response and store it in Redis cache for future use
 	serializedResponse, err := json.Marshal(destinations)
 	if err != nil {
-		return nil, err
+		log.Print(err)
 	}
 	err = server.cache.Set(ctx, redisKey, serializedResponse, time.Hour)
 	if err != nil {
-		return nil, err
+		log.Print(err)
 	}
 
 	return &pb.GetDestinationsResponse{
@@ -98,11 +98,11 @@ func (server *DestinationServer) GetDestinationById(ctx context.Context, req *pb
 	// Serialize the response and store it in Redis cache for future use
 	serializedResponse, err := json.Marshal(destination)
 	if err != nil {
-		return nil, err
+		log.Print(err)
 	}
 	err = server.cache.Set(ctx, redisKey, serializedResponse, time.Hour)
 	if err != nil {
-		return nil, err
+		log.Print(err)
 	}
 
 	return &destination, nil
@@ -143,7 +143,7 @@ func (server *DestinationServer) CreateDestination(ctx context.Context, req *pb.
 	// Set cache data for new destination
 	jsonDes, err := json.Marshal(destination)
 	if err != nil {
-		return nil, err
+		log.Print(err)
 	}
 
 	if err = server.cache.Set(ctx, fmt.Sprintf("%s#%d", constant.DESTINATION_REDIS, destination.Id), jsonDes, time.Hour); err != nil {
@@ -192,7 +192,7 @@ func (server *DestinationServer) UpdateDestination(ctx context.Context, req *pb.
 	// Set cache data for new destination
 	jsonDes, err := json.Marshal(destination)
 	if err != nil {
-		return nil, err
+		log.Print(err)
 	}
 
 	if err = server.cache.Set(ctx, fmt.Sprintf("%s#%d", constant.DESTINATION_REDIS, destination.Id), jsonDes, time.Hour); err != nil {

@@ -10,6 +10,15 @@
     },
     {
       "name": "DestinationService"
+    },
+    {
+      "name": "GalleryService"
+    },
+    {
+      "name": "PackageService"
+    },
+    {
+      "name": "TypeService"
     }
   ],
   "consumes": [
@@ -371,9 +380,403 @@
           "DestinationService"
         ]
       }
+    },
+    "/galleries": {
+      "post": {
+        "operationId": "GalleryService_AddImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbAddImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbAddImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GalleryService"
+        ]
+      }
+    },
+    "/galleries/{desId}": {
+      "get": {
+        "operationId": "GalleryService_GetImages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetImagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "desId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "GalleryService"
+        ]
+      }
+    },
+    "/galleries/{id}": {
+      "delete": {
+        "operationId": "GalleryService_DeleteImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeleteImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "GalleryService"
+        ]
+      }
+    },
+    "/packages": {
+      "get": {
+        "operationId": "PackageService_GetPackages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetPackagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
+      },
+      "post": {
+        "operationId": "PackageService_CreatePackage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbPackage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreatePackageReq"
+            }
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
+      }
+    },
+    "/packages/{id}": {
+      "get": {
+        "operationId": "PackageService_GetPackage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbPackage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
+      },
+      "delete": {
+        "operationId": "PackageService_DeletePackage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeletePackageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
+      },
+      "put": {
+        "operationId": "PackageService_UpdatePackage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbPackage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "desId": {
+                  "type": "string",
+                  "format": "uint64"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "imgUrl": {
+                  "type": "string"
+                },
+                "duration": {
+                  "type": "string"
+                },
+                "numberPeople": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uint64"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "PackageService"
+        ]
+      }
+    },
+    "/types": {
+      "get": {
+        "operationId": "TypeService_GetTypes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetTypesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TypeService"
+        ]
+      },
+      "post": {
+        "operationId": "TypeService_CreateType",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateTypeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateTypeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TypeService"
+        ]
+      }
+    },
+    "/types/{id}": {
+      "delete": {
+        "operationId": "TypeService_DeleteType",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeleteTypeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TypeService"
+        ]
+      }
     }
   },
   "definitions": {
+    "pbAddImageRequest": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "desId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "pbAddImageResponse": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "$ref": "#/definitions/pbImage"
+        }
+      }
+    },
     "pbChangePasswordRequest": {
       "type": "object",
       "properties": {
@@ -434,6 +837,58 @@
         }
       }
     },
+    "pbCreatePackageReq": {
+      "type": "object",
+      "properties": {
+        "desId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "imgUrl": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "numberPeople": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
+    "pbCreateTypeRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateTypeResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
     "pbCreateUserRequest": {
       "type": "object",
       "properties": {
@@ -455,6 +910,30 @@
       }
     },
     "pbDeleteDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbDeleteImageResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbDeletePackageResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "pbDeleteTypeResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -511,6 +990,61 @@
         }
       }
     },
+    "pbGetImagesResponse": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbImage"
+          }
+        }
+      }
+    },
+    "pbGetPackagesResponse": {
+      "type": "object",
+      "properties": {
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbPackage"
+          }
+        },
+        "pagination": {
+          "$ref": "#/definitions/pbPagination"
+        }
+      }
+    },
+    "pbGetTypesResponse": {
+      "type": "object",
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbType"
+          }
+        }
+      }
+    },
+    "pbImage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "url": {
+          "type": "string"
+        },
+        "desId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "pbLoginRequest": {
       "type": "object",
       "properties": {
@@ -547,6 +1081,59 @@
         }
       }
     },
+    "pbPackage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "desId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "imgUrl": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "numberPeople": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbType"
+          }
+        }
+      }
+    },
+    "pbPagination": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "pbRenewTokenRequest": {
       "type": "object",
       "properties": {
@@ -564,6 +1151,18 @@
         "accessTokenExpiresAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "pbType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
         }
       }
     },

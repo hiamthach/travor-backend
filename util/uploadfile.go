@@ -8,7 +8,6 @@ import (
 	"time"
 
 	stor "cloud.google.com/go/storage"
-	"github.com/gin-gonic/gin"
 	"github.com/travor-backend/db"
 
 	_ "image/gif"
@@ -20,7 +19,7 @@ const (
 	MaxFileSize = 5 << 20 // Maximum file size allowed (5MB)
 )
 
-func UploadFile(file *multipart.FileHeader, ctx *gin.Context) (*stor.ObjectAttrs, error) {
+func UploadFile(file *multipart.FileHeader, ctx context.Context) (*stor.ObjectAttrs, error) {
 	client := db.Storage
 
 	if file.Size > MaxFileSize {
@@ -33,11 +32,6 @@ func UploadFile(file *multipart.FileHeader, ctx *gin.Context) (*stor.ObjectAttrs
 		return nil, err
 	}
 	defer src.Close()
-
-	// _, _, err = image.DecodeConfig(src)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	filename := generateFilename(file.Filename)
 	folderPath := "images/galleries/" + filename
@@ -60,7 +54,7 @@ func UploadFile(file *multipart.FileHeader, ctx *gin.Context) (*stor.ObjectAttrs
 		return nil, err
 	}
 
-	if err := obj.ACL().Set(ctx.Request.Context(), stor.AllUsers, stor.RoleReader); err != nil {
+	if err := obj.ACL().Set(ctx, stor.AllUsers, stor.RoleReader); err != nil {
 		return nil, err
 	}
 
