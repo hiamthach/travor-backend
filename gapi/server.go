@@ -145,7 +145,7 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 
 	log.Println("Starting gateway server on", config.ServerAddress)
 
-	err = http.Serve(listener, mux)
+	err = http.Serve(listener, enableCors(mux))
 	if err != nil {
 		log.Fatal("Can not start server: ", err)
 	}
@@ -175,15 +175,15 @@ func handleBinaryFileUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 // Enable CORS
-// func enableCors(h http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		w.Header().Set("Access-Control-Allow-Origin", "*")
-// 		w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, HEAD, OPTIONS")
-// 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, X-CSRF-Token")
-// 		if r.Method == http.MethodOptions {
-// 			w.WriteHeader(http.StatusNoContent)
-// 			return
-// 		}
-// 		h.ServeHTTP(w, r)
-// 	})
-// }
+func enableCors(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, HEAD, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization, X-CSRF-Token")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
+}
