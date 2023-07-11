@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type User struct {
 	Username          string    `json:"username" gorm:"primaryKey"`
@@ -12,6 +16,16 @@ type User struct {
 	CreatedAt         time.Time `json:"created_at" gorm:"created_at"`
 	Role              int       `json:"role" gorm:"role"`
 	Status            bool      `json:"status" gorm:"status"`
+}
+
+type UserSessionParams struct {
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	RefreshToken string    `json:"refresh_token"`
+	UserAgent    string    `json:"user_agent"`
+	ClientIp     string    `json:"client_ip"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	IsBlocked    bool      `json:"is_blocked"`
 }
 
 func (*User) TableName() string {

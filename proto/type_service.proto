@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/travor-backend/pb";
+
+service TypeService {
+  rpc GetTypes(GetTypesRequest) returns (GetTypesResponse) {
+    option (google.api.http) = {
+      get: "/types"
+    };
+  }
+
+  rpc CreateType(CreateTypeRequest) returns (CreateTypeResponse) {
+    option (google.api.http) = {
+      post: "/types"
+      body: "*"
+    };
+  }
+
+  rpc DeleteType(DeleteTypeRequest) returns (DeleteTypeResponse) {
+    option (google.api.http) = {
+        delete: "/types/{id}"
+    };
+  }
+}
+
+message Type {
+  int64 id = 1;
+  string name = 2;
+}
+
+message GetTypesRequest {}
+
+message GetTypesResponse {
+  repeated Type types = 1;
+}
+
+message CreateTypeRequest {
+  string name = 1;
+}
+
+message CreateTypeResponse {
+  bool success = 1;
+}
+
+message DeleteTypeRequest {
+  string id = 1;
+}
+
+message DeleteTypeResponse {
+  bool success = 1;
+}
