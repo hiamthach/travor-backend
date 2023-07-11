@@ -25,6 +25,6 @@ func main() {
 	}
 
 	// Run gRPC Server
-	go gapi.RunGatewayServer(config, db.DB, *redisUtil)
-	gapi.RunGRPCServer(config, db.DB, *redisUtil)
+	go gapi.RunGRPCServer(config, db.DB, *redisUtil)
+	gapi.RunGatewayServer(config, db.DB, *redisUtil)
 }
