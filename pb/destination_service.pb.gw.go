@@ -36,7 +36,7 @@ var (
 )
 
 func request_DestinationService_GetDestinations_0(ctx context.Context, marshaler runtime.Marshaler, client DestinationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetDestinationsRequest
+	var protoReq Pagination
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -52,7 +52,7 @@ func request_DestinationService_GetDestinations_0(ctx context.Context, marshaler
 }
 
 func local_request_DestinationService_GetDestinations_0(ctx context.Context, marshaler runtime.Marshaler, server DestinationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetDestinationsRequest
+	var protoReq Pagination
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {

@@ -58,6 +58,11 @@ func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination
 		return nil, err
 	}
 
+	var total int64
+	if err := server.store.Model(&model.Package{}).Count(&total).Error; err != nil {
+		return nil, err
+	}
+
 	makePackages := make([]model.Package, len(packages))
 	for i, p := range packages {
 		makePackages[i] = *p
@@ -77,6 +82,11 @@ func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination
 
 	return &pb.GetPackagesResponse{
 		Packages: convertedPackages,
+		Pagination: &pb.PaginationRes{
+			Total:    total,
+			Page:     req.Page,
+			PageSize: req.PageSize,
+		},
 	}, nil
 }
 
