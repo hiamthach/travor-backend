@@ -41,14 +41,12 @@ func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination
 	cachedResponse, err := server.cache.Get(ctx, redisKey)
 	if err == nil {
 		// If the response is found in the cache, deserialize it and return
-		var packages []*pb.Package
-		err = json.Unmarshal([]byte(cachedResponse), &packages)
+		var res *pb.GetPackagesResponse
+		err = json.Unmarshal([]byte(cachedResponse), &res)
 		if err != nil {
 			return nil, err
 		}
-		return &pb.GetPackagesResponse{
-			Packages: packages,
-		}, nil
+		return res, nil
 	}
 
 	// If not found in cache, get from db
@@ -65,8 +63,22 @@ func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination
 
 	convertedPackages := convertPackages(makePackages)
 
+	var total int64
+	if err := server.store.Model(&model.Package{}).Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	res := &pb.GetPackagesResponse{
+		Packages: convertedPackages,
+		Pagination: &pb.PaginationRes{
+			Total:    total,
+			Page:     req.Page,
+			PageSize: req.PageSize,
+		},
+	}
+
 	// Serialize the response and store it in Redis cache for future use
-	serializedResponse, err := json.Marshal(convertedPackages)
+	serializedResponse, err := json.Marshal(res)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +87,7 @@ func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination
 		return nil, err
 	}
 
-	return &pb.GetPackagesResponse{
-		Packages: convertedPackages,
-	}, nil
+	return res, nil
 }
 
 func (server *PackageServer) GetPackage(ctx context.Context, req *pb.PackageID) (*pb.Package, error) {

@@ -3,11 +3,12 @@ syntax = "proto3";
 package pb;
 
 import "google/api/annotations.proto";
+import "pagination.proto";
 
 option go_package = "github.com/travor-backend/pb";
 
 service DestinationService {
-  rpc GetDestinations(GetDestinationsRequest) returns (GetDestinationsResponse) {
+  rpc GetDestinations(Pagination) returns (GetDestinationsResponse) {
     option (google.api.http) = {
       get: "/destinations"
     };
@@ -64,6 +65,7 @@ message GetDestinationByIdRequest {
 
 message GetDestinationsResponse {
   repeated Destination destinations = 1;
+  PaginationRes pagination = 2;
 }
 
 message CreateDestinationRequest {

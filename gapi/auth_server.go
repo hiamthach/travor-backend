@@ -61,7 +61,7 @@ func (server *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.
 		ExpiresAt:    refreshPayload.ExpiredAt,
 	}
 
-	if err := server.store.Create(&session).Error; err != nil {
+	if err := server.store.Table("sessions").Create(&session).Error; err != nil {
 		return nil, err
 	}
 

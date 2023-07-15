@@ -32,7 +32,7 @@ func NewDestinationServer(config util.Config, cache util.RedisUtil) (*Destinatio
 	return &DestinationServer{store: desDb, config: config, cache: cache}, nil
 }
 
-func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.GetDestinationsRequest) (*pb.GetDestinationsResponse, error) {
+func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Pagination) (*pb.GetDestinationsResponse, error) {
 	// Create a Redis key based on the request parameters
 	redisKey := fmt.Sprintf("%s:%d:%d", constant.DESTINATION_REDIS, req.PageSize, req.Page)
 
@@ -40,14 +40,12 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 	cachedResponse, err := server.cache.Get(ctx, redisKey)
 	if err == nil {
 		// If the response is found in the cache, deserialize it and return
-		var destinations []*pb.Destination
-		err = json.Unmarshal([]byte(cachedResponse), &destinations)
+		var response *pb.GetDestinationsResponse
+		err = json.Unmarshal([]byte(cachedResponse), &response)
 		if err != nil {
 			return nil, err
 		}
-		return &pb.GetDestinationsResponse{
-			Destinations: destinations,
-		}, nil
+		return response, err
 	}
 
 	// If not found in cache, get from db
@@ -57,8 +55,22 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 		return nil, err
 	}
 
+	var total int64
+	if err := server.store.Model(&pb.Destination{}).Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	res := &pb.GetDestinationsResponse{
+		Destinations: destinations,
+		Pagination: &pb.PaginationRes{
+			PageSize: req.PageSize,
+			Page:     req.Page,
+			Total:    total,
+		},
+	}
+
 	// Serialize the response and store it in Redis cache for future use
-	serializedResponse, err := json.Marshal(destinations)
+	serializedResponse, err := json.Marshal(res)
 	if err != nil {
 		log.Print(err)
 	}
@@ -67,9 +79,7 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 		log.Print(err)
 	}
 
-	return &pb.GetDestinationsResponse{
-		Destinations: destinations,
-	}, nil
+	return res, nil
 }
 
 func (server *DestinationServer) GetDestinationById(ctx context.Context, req *pb.GetDestinationByIdRequest) (*pb.Destination, error) {
