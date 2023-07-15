@@ -56,7 +56,7 @@ message Package {
 
 message GetPackagesResponse {
   repeated Package packages = 1;
-  PaginationRes pagination = 2;
+  Pagination pagination = 2;
 }
 
 message PackageID {

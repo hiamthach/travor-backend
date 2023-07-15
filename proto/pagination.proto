@@ -8,9 +8,3 @@ message Pagination {
   uint32 page = 1;
   uint32 page_size = 2;
 }
-
-message PaginationRes {
-  uint32 page = 1;
-  uint32 page_size = 2;
-  int64 total = 3;
-}

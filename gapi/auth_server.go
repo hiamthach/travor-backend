@@ -120,7 +120,7 @@ func (server *AuthServer) RenewToken(ctx context.Context, req *pb.RenewTokenRequ
 	}
 
 	var user model.User
-	if err := server.store.Table("sessions").Where("username = ?", session.Username).First(&user).Error; err != nil {
+	if err := server.store.Where("username = ?", session.Username).First(&user).Error; err != nil {
 		return nil, err
 	}
 

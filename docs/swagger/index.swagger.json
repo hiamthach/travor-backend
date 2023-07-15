@@ -987,9 +987,6 @@
             "type": "object",
             "$ref": "#/definitions/pbDestination"
           }
-        },
-        "pagination": {
-          "$ref": "#/definitions/pbPaginationRes"
         }
       }
     },
@@ -1016,7 +1013,7 @@
           }
         },
         "pagination": {
-          "$ref": "#/definitions/pbPaginationRes"
+          "$ref": "#/definitions/pbPagination"
         }
       }
     },
@@ -1124,7 +1121,7 @@
         }
       }
     },
-    "pbPaginationRes": {
+    "pbPagination": {
       "type": "object",
       "properties": {
         "page": {
@@ -1133,10 +1130,6 @@
         },
         "pageSize": {
           "type": "integer",
-          "format": "int64"
-        },
-        "total": {
-          "type": "string",
           "format": "int64"
         }
       }
