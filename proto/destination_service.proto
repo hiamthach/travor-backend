@@ -8,7 +8,9 @@ import "pagination.proto";
 option go_package = "github.com/travor-backend/pb";
 
 service DestinationService {
-  rpc GetDestinations(Pagination) returns (GetDestinationsResponse) {
+  rpc isValid(ValidRequest) returns (DestinationValid) {}
+
+  rpc GetDestinations(GetDestinationsRequest) returns (GetDestinationsResponse) {
     option (google.api.http) = {
       get: "/destinations"
     };
@@ -54,9 +56,22 @@ message Destination {
   string location = 10;
 }
 
+message ValidRequest {
+  uint64 id = 1;
+}
+
+message DestinationValid {
+  bool valid = 1;
+}
+
+message DestinationFilter {
+  string keyword = 1;
+}
+
 message GetDestinationsRequest {
   uint32 page = 1;
   uint32 page_size = 2;
+  string keyword = 3;
 }
 
 message GetDestinationByIdRequest {

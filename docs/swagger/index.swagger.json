@@ -18,6 +18,9 @@
       "name": "PackageService"
     },
     {
+      "name": "TripService"
+    },
+    {
       "name": "TypeService"
     }
   ],
@@ -217,6 +220,12 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -413,6 +422,38 @@
         ]
       }
     },
+    "/galleries/list": {
+      "post": {
+        "operationId": "GalleryService_AddListImages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbAddListImagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbAddListImagesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GalleryService"
+        ]
+      }
+    },
     "/galleries/{desId}": {
       "get": {
         "operationId": "GalleryService_GetImages",
@@ -435,8 +476,8 @@
             "name": "desId",
             "in": "path",
             "required": true,
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uint64"
           }
         ],
         "tags": [
@@ -673,6 +714,171 @@
         ]
       }
     },
+    "/trips": {
+      "get": {
+        "operationId": "TripService_GetTrips",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetTripsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TripService"
+        ]
+      },
+      "post": {
+        "operationId": "TripService_CreateTrip",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbTrip"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateTripRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TripService"
+        ]
+      }
+    },
+    "/trips/{id}": {
+      "get": {
+        "operationId": "TripService_GetTrip",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbTrip"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "TripService"
+        ]
+      },
+      "delete": {
+        "operationId": "TripService_DeleteTrip",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeleteTripResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "TripService"
+        ]
+      },
+      "put": {
+        "operationId": "TripService_UpdateTrip",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbTrip"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "type": "string"
+                },
+                "total": {
+                  "type": "string",
+                  "format": "int64"
+                },
+                "notes": {
+                  "type": "string"
+                },
+                "startDate": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "TripService"
+        ]
+      }
+    },
     "/types": {
       "get": {
         "operationId": "TypeService_GetTypes",
@@ -764,8 +970,8 @@
           "type": "string"
         },
         "desId": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string",
+          "format": "uint64"
         }
       }
     },
@@ -774,6 +980,33 @@
       "properties": {
         "image": {
           "$ref": "#/definitions/pbImage"
+        }
+      }
+    },
+    "pbAddListImagesRequest": {
+      "type": "object",
+      "properties": {
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "desId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "pbAddListImagesResponse": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbImage"
+          }
         }
       }
     },
@@ -873,6 +1106,25 @@
         }
       }
     },
+    "pbCreateTripRequest": {
+      "type": "object",
+      "properties": {
+        "pId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        }
+      }
+    },
     "pbCreateTypeRequest": {
       "type": "object",
       "properties": {
@@ -933,6 +1185,14 @@
         }
       }
     },
+    "pbDeleteTripResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
     "pbDeleteTypeResponse": {
       "type": "object",
       "properties": {
@@ -978,6 +1238,14 @@
         }
       }
     },
+    "pbDestinationValid": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        }
+      }
+    },
     "pbGetDestinationsResponse": {
       "type": "object",
       "properties": {
@@ -1020,6 +1288,18 @@
         }
       }
     },
+    "pbGetTripsResponse": {
+      "type": "object",
+      "properties": {
+        "trips": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbTrip"
+          }
+        }
+      }
+    },
     "pbGetTypesResponse": {
       "type": "object",
       "properties": {
@@ -1043,8 +1323,16 @@
           "type": "string"
         },
         "desId": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "pbIsValidPackageResponse": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
         }
       }
     },
@@ -1156,6 +1444,33 @@
           "type": "string"
         },
         "accessTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbTrip": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "user": {
+          "type": "string"
+        },
+        "pId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "startDate": {
           "type": "string",
           "format": "date-time"
         }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/travor-backend/constant"
@@ -32,9 +33,14 @@ func NewDestinationServer(config util.Config, cache util.RedisUtil) (*Destinatio
 	return &DestinationServer{store: desDb, config: config, cache: cache}, nil
 }
 
-func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Pagination) (*pb.GetDestinationsResponse, error) {
+func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.GetDestinationsRequest) (*pb.GetDestinationsResponse, error) {
 	// Create a Redis key based on the request parameters
-	redisKey := fmt.Sprintf("%s:%d:%d", constant.DESTINATION_REDIS, req.PageSize, req.Page)
+	var redisKey string
+	if req.Keyword == "" {
+		redisKey = fmt.Sprintf("%s:%d:%d", constant.DESTINATION_REDIS, req.PageSize, req.Page)
+	} else {
+		redisKey = fmt.Sprintf("%s:%d:%d:%s", constant.DESTINATION_REDIS, req.PageSize, req.Page, req.Keyword)
+	}
 
 	// Get data from cache
 	cachedResponse, err := server.cache.Get(ctx, redisKey)
@@ -51,7 +57,12 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Pa
 	// If not found in cache, get from db
 	var destinations []*pb.Destination
 
-	if err := server.store.Limit(int(req.PageSize)).Offset(int(req.PageSize) * (int(req.Page) - 1)).Find(&destinations).Error; err != nil {
+	// If keyword is empty, get all destinations, else get destinations by keyword ignore case
+	if err := server.store.
+		Limit(int(req.PageSize)).
+		Offset(int(req.PageSize)*(int(req.Page)-1)).
+		Where("LOWER(name) LIKE ?", "%"+strings.ToLower(req.Keyword)+"%").
+		Find(&destinations).Error; err != nil {
 		return nil, err
 	}
 

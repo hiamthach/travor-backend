@@ -9,6 +9,8 @@ import "type_service.proto";
 option go_package = "github.com/travor-backend/pb";
 
 service PackageService {
+  rpc IsValidPackage (PackageID) returns (IsValidPackageResponse) {}
+
   rpc GetPackages(Pagination) returns (GetPackagesResponse) {
     option (google.api.http) = {
       get: "/packages"
@@ -54,13 +56,17 @@ message Package {
   repeated Type types = 9;
 }
 
+message PackageID {
+  uint64 id = 1;
+}
+
+message IsValidPackageResponse {
+  bool valid = 1;
+}
+
 message GetPackagesResponse {
   repeated Package packages = 1;
   PaginationRes pagination = 2;
-}
-
-message PackageID {
-  uint64 id = 1;
 }
 
 message CreatePackageReq {

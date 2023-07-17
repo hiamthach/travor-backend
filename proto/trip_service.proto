@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/travor-backend/pb";
+
+service TripService {
+  rpc CreateTrip(CreateTripRequest) returns (Trip) {
+    option (google.api.http) = {
+      post: "/trips"
+      body: "*"
+    };
+  }
+
+  rpc GetTrip(GetTripRequest) returns (Trip) {
+    option (google.api.http) = {
+      get: "/trips/{id}"
+    };
+  }
+
+  rpc GetTrips(GetTripsRequest) returns (GetTripsResponse) {
+    option (google.api.http) = {
+      get: "/trips"
+    };
+  }
+
+  rpc UpdateTrip(UpdateTripRequest) returns (Trip) {
+    option (google.api.http) = {
+      put: "/trips/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteTrip(DeleteTripRequest) returns (DeleteTripResponse) {
+    option (google.api.http) = {
+      delete: "/trips/{id}"
+    };
+  }
+}
+
+message Trip {
+  uint64 id = 1;
+  string user = 2;
+  uint64 p_id = 3;
+  int64 total = 4;
+  string notes = 5;
+  google.protobuf.Timestamp start_date = 6;
+}
+
+message CreateTripRequest {
+  uint64 p_id = 1;
+  int64 total = 2;
+  string notes = 3;
+  string start_date = 4;
+}
+
+message GetTripRequest {
+  uint64 id = 1;
+}
+
+message GetTripsRequest {}
+
+message GetTripsResponse {
+  repeated Trip trips = 1;
+}
+
+message UpdateTripRequest {
+  uint64 id = 1;
+  string user = 2;
+  int64 total = 3;
+  string notes = 4;
+  google.protobuf.Timestamp start_date = 5;
+}
+
+message DeleteTripRequest {
+  uint64 id = 1;
+}
+
+message DeleteTripResponse {
+  bool success = 1;  
+}
+

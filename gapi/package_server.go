@@ -33,6 +33,20 @@ func NewPackageServer(config util.Config, cache util.RedisUtil) (*PackageServer,
 	return &PackageServer{store: pkgDb, config: config, cache: cache}, nil
 }
 
+func (server *PackageServer) IsValidPackage(ctx context.Context, req *pb.PackageID) (*pb.IsValidPackageResponse, error) {
+	var packageModel model.Package
+
+	if err := server.store.First(&packageModel, req.Id).Error; err != nil {
+		return &pb.IsValidPackageResponse{
+			Valid: false,
+		}, nil
+	}
+
+	return &pb.IsValidPackageResponse{
+		Valid: true,
+	}, nil
+}
+
 func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination) (*pb.GetPackagesResponse, error) {
 	// Create a Redis key based on the request parameters
 	redisKey := fmt.Sprintf("%s:%d:%d", constant.PACKAGE_REDIS, req.PageSize, req.Page)
