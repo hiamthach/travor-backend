@@ -33,6 +33,44 @@ func NewDestinationServer(config util.Config, cache util.RedisUtil) (*Destinatio
 	return &DestinationServer{store: desDb, config: config, cache: cache}, nil
 }
 
+func (server *DestinationServer) GetAll(ctx context.Context, req *pb.GetAllRequest) (*pb.GetAllResponse, error) {
+	// Get from redis
+	redisKey := fmt.Sprintf("%s:all", constant.DESTINATION_REDIS)
+
+	cachedResponse, err := server.cache.Get(ctx, redisKey)
+	if err == nil {
+		// If the response is found in the cache, deserialize it and return
+		var response *pb.GetAllResponse
+		err = json.Unmarshal([]byte(cachedResponse), &response)
+		if err != nil {
+			return nil, err
+		}
+		return response, err
+	}
+
+	var destinations []*pb.DestinationStats
+
+	if err := server.store.Table("destinations").Select("id", "name").Find(&destinations).Error; err != nil {
+		return nil, err
+	}
+
+	res := &pb.GetAllResponse{
+		Destinations: destinations,
+	}
+
+	// Serialize the response and store it in Redis cache for future use
+	serializedResponse, err := json.Marshal(res)
+	if err != nil {
+		log.Print(err)
+	}
+
+	if err = server.cache.Set(ctx, redisKey, serializedResponse, time.Hour); err != nil {
+		log.Print(err)
+	}
+
+	return res, nil
+}
+
 func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.GetDestinationsRequest) (*pb.GetDestinationsResponse, error) {
 	// Create a Redis key based on the request parameters
 	var redisKey string
@@ -110,7 +148,7 @@ func (server *DestinationServer) GetDestinationById(ctx context.Context, req *pb
 	}
 
 	// If not found in cache, get from db
-	var destination pb.Destination
+	var destination *pb.Destination
 
 	if err := server.store.First(&destination, req.Id).Error; err != nil {
 		return nil, err
@@ -126,7 +164,7 @@ func (server *DestinationServer) GetDestinationById(ctx context.Context, req *pb
 		log.Print(err)
 	}
 
-	return &destination, nil
+	return destination, nil
 }
 
 func (server *DestinationServer) CreateDestination(ctx context.Context, req *pb.CreateDestinationRequest) (*pb.CreateDestinationResponse, error) {

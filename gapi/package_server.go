@@ -96,7 +96,7 @@ func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination
 	if err != nil {
 		return nil, err
 	}
-	err = server.cache.Set(ctx, redisKey, serializedResponse, 0)
+	err = server.cache.Set(ctx, redisKey, serializedResponse, time.Hour)
 	if err != nil {
 		return nil, err
 	}

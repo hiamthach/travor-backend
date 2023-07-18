@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	DestinationService_IsValid_FullMethodName            = "/pb.DestinationService/isValid"
+	DestinationService_GetAll_FullMethodName             = "/pb.DestinationService/GetAll"
 	DestinationService_GetDestinations_FullMethodName    = "/pb.DestinationService/GetDestinations"
 	DestinationService_GetDestinationById_FullMethodName = "/pb.DestinationService/GetDestinationById"
 	DestinationService_CreateDestination_FullMethodName  = "/pb.DestinationService/CreateDestination"
@@ -32,6 +33,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DestinationServiceClient interface {
 	IsValid(ctx context.Context, in *ValidRequest, opts ...grpc.CallOption) (*DestinationValid, error)
+	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	GetDestinations(ctx context.Context, in *GetDestinationsRequest, opts ...grpc.CallOption) (*GetDestinationsResponse, error)
 	GetDestinationById(ctx context.Context, in *GetDestinationByIdRequest, opts ...grpc.CallOption) (*Destination, error)
 	CreateDestination(ctx context.Context, in *CreateDestinationRequest, opts ...grpc.CallOption) (*CreateDestinationResponse, error)
@@ -50,6 +52,15 @@ func NewDestinationServiceClient(cc grpc.ClientConnInterface) DestinationService
 func (c *destinationServiceClient) IsValid(ctx context.Context, in *ValidRequest, opts ...grpc.CallOption) (*DestinationValid, error) {
 	out := new(DestinationValid)
 	err := c.cc.Invoke(ctx, DestinationService_IsValid_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *destinationServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
+	err := c.cc.Invoke(ctx, DestinationService_GetAll_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +117,7 @@ func (c *destinationServiceClient) DeleteDestination(ctx context.Context, in *De
 // for forward compatibility
 type DestinationServiceServer interface {
 	IsValid(context.Context, *ValidRequest) (*DestinationValid, error)
+	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
 	GetDestinations(context.Context, *GetDestinationsRequest) (*GetDestinationsResponse, error)
 	GetDestinationById(context.Context, *GetDestinationByIdRequest) (*Destination, error)
 	CreateDestination(context.Context, *CreateDestinationRequest) (*CreateDestinationResponse, error)
@@ -120,6 +132,9 @@ type UnimplementedDestinationServiceServer struct {
 
 func (UnimplementedDestinationServiceServer) IsValid(context.Context, *ValidRequest) (*DestinationValid, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsValid not implemented")
+}
+func (UnimplementedDestinationServiceServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (UnimplementedDestinationServiceServer) GetDestinations(context.Context, *GetDestinationsRequest) (*GetDestinationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDestinations not implemented")
@@ -163,6 +178,24 @@ func _DestinationService_IsValid_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DestinationServiceServer).IsValid(ctx, req.(*ValidRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DestinationService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DestinationServiceServer).GetAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DestinationService_GetAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DestinationServiceServer).GetAll(ctx, req.(*GetAllRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -267,6 +300,10 @@ var DestinationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "isValid",
 			Handler:    _DestinationService_IsValid_Handler,
+		},
+		{
+			MethodName: "GetAll",
+			Handler:    _DestinationService_GetAll_Handler,
 		},
 		{
 			MethodName: "GetDestinations",

@@ -714,6 +714,28 @@
         ]
       }
     },
+    "/stats/destinations": {
+      "get": {
+        "operationId": "DestinationService_GetAll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetAllResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "DestinationService"
+        ]
+      }
+    },
     "/trips": {
       "get": {
         "operationId": "TripService_GetTrips",
@@ -1234,11 +1256,35 @@
         }
       }
     },
+    "pbDestinationStats": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "pbDestinationValid": {
       "type": "object",
       "properties": {
         "valid": {
           "type": "boolean"
+        }
+      }
+    },
+    "pbGetAllResponse": {
+      "type": "object",
+      "properties": {
+        "destinations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbDestinationStats"
+          }
         }
       }
     },

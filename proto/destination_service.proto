@@ -10,6 +10,12 @@ option go_package = "github.com/travor-backend/pb";
 service DestinationService {
   rpc isValid(ValidRequest) returns (DestinationValid) {}
 
+  rpc GetAll(GetAllRequest) returns (GetAllResponse) {
+    option (google.api.http) = {
+      get: "/stats/destinations"
+    };
+  }
+
   rpc GetDestinations(GetDestinationsRequest) returns (GetDestinationsResponse) {
     option (google.api.http) = {
       get: "/destinations"
@@ -56,8 +62,19 @@ message Destination {
   string location = 10;
 }
 
+message DestinationStats {
+  uint64 id = 1;
+  string name = 2;
+}
+
 message ValidRequest {
   uint64 id = 1;
+}
+
+message GetAllRequest {}
+
+message GetAllResponse {
+  repeated DestinationStats destinations = 1;
 }
 
 message DestinationValid {
