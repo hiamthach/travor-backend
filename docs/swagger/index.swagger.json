@@ -856,9 +856,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "user": {
-                  "type": "string"
-                },
                 "total": {
                   "type": "string",
                   "format": "int64"
@@ -867,8 +864,7 @@
                   "type": "string"
                 },
                 "startDate": {
-                  "type": "string",
-                  "format": "date-time"
+                  "type": "string"
                 }
               }
             }
@@ -1456,7 +1452,7 @@
           "type": "string",
           "format": "uint64"
         },
-        "user": {
+        "username": {
           "type": "string"
         },
         "pId": {

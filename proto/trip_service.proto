@@ -43,7 +43,7 @@ service TripService {
 
 message Trip {
   uint64 id = 1;
-  string user = 2;
+  string username = 2;
   uint64 p_id = 3;
   int64 total = 4;
   string notes = 5;
@@ -69,10 +69,9 @@ message GetTripsResponse {
 
 message UpdateTripRequest {
   uint64 id = 1;
-  string user = 2;
-  int64 total = 3;
-  string notes = 4;
-  google.protobuf.Timestamp start_date = 5;
+  int64 total = 2;
+  string notes = 3;
+  string start_date = 4;
 }
 
 message DeleteTripRequest {

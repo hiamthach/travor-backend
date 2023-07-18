@@ -11,4 +11,5 @@ const (
 	TYPE_REDIS        = "types"
 	PACKAGE_REDIS     = "packages"
 	GALLERY_REDIS     = "galleries"
+	TRIP_REDIS        = "trips"
 )

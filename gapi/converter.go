@@ -51,3 +51,14 @@ func convertPackages(packages []model.Package) []*pb.Package {
 	}
 	return result
 }
+
+func convertTrip(trip model.Trip) *pb.Trip {
+	return &pb.Trip{
+		Id:        trip.Id,
+		Username:  trip.Username,
+		PId:       trip.PId,
+		Total:     trip.Total,
+		Notes:     trip.Notes,
+		StartDate: timestamppb.New(trip.StartDate),
+	}
+}

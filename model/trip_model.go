@@ -4,7 +4,7 @@ import "time"
 
 type Trip struct {
 	Id        uint64    `json:"id" gorm:"primaryKey;autoIncrement"`
-	User      string    `json:"user" gorm:"user"`
+	Username  string    `json:"user" gorm:"username"`
 	PId       uint64    `json:"p_id" gorm:"p_id"`
 	Total     int64     `json:"total" gorm:"total"`
 	Notes     string    `json:"notes" gorm:"notes"`
