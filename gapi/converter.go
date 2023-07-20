@@ -34,6 +34,7 @@ func convertTypes(types []model.Type) []*pb.Type {
 func convertPackage(pkg model.Package) *pb.Package {
 	return &pb.Package{
 		Id:           pkg.ID,
+		DesId:        pkg.DesID,
 		Name:         pkg.Name,
 		Details:      pkg.Details,
 		Price:        pkg.Price,
@@ -50,4 +51,15 @@ func convertPackages(packages []model.Package) []*pb.Package {
 		result = append(result, convertPackage(p))
 	}
 	return result
+}
+
+func convertTrip(trip model.Trip) *pb.Trip {
+	return &pb.Trip{
+		Id:        trip.Id,
+		Username:  trip.Username,
+		PId:       trip.PId,
+		Total:     trip.Total,
+		Notes:     trip.Notes,
+		StartDate: timestamppb.New(trip.StartDate),
+	}
 }

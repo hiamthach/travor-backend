@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/travor-backend/constant"
@@ -33,28 +34,88 @@ func NewPackageServer(config util.Config, cache util.RedisUtil) (*PackageServer,
 	return &PackageServer{store: pkgDb, config: config, cache: cache}, nil
 }
 
-func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination) (*pb.GetPackagesResponse, error) {
+func (server *PackageServer) IsValidPackage(ctx context.Context, req *pb.PackageID) (*pb.IsValidPackageResponse, error) {
+	var packageModel model.Package
+
+	if err := server.store.First(&packageModel, req.Id).Error; err != nil {
+		return &pb.IsValidPackageResponse{
+			Valid: false,
+		}, nil
+	}
+
+	return &pb.IsValidPackageResponse{
+		Valid: true,
+	}, nil
+}
+
+func (server *PackageServer) GetAll(ctx context.Context, req *pb.GetPkgStatsRequest) (*pb.GetPkgStatsResponse, error) {
+	// Get from redis
+	redisKey := fmt.Sprintf("%s:all", constant.PACKAGE_REDIS)
+
+	cachedResponse, err := server.cache.Get(ctx, redisKey)
+	if err == nil {
+		// If the response is found in the cache, deserialize it and return
+		var response *pb.GetPkgStatsResponse
+		err = json.Unmarshal([]byte(cachedResponse), &response)
+		if err != nil {
+			return nil, err
+		}
+		return response, err
+	}
+
+	var packages []*pb.PackageStats
+
+	if err := server.store.Table("packages").Select("id", "name").Find(&packages).Error; err != nil {
+		return nil, err
+	}
+
+	res := &pb.GetPkgStatsResponse{
+		Packages: packages,
+	}
+
+	// Serialize the response and store it in Redis cache for future use
+	serializedResponse, err := json.Marshal(res)
+	if err != nil {
+		log.Print(err)
+	}
+
+	if err = server.cache.Set(ctx, redisKey, serializedResponse, time.Hour); err != nil {
+		log.Print(err)
+	}
+
+	return res, nil
+}
+
+func (server *PackageServer) GetPackages(ctx context.Context, req *pb.GetPackagesRequest) (*pb.GetPackagesResponse, error) {
 	// Create a Redis key based on the request parameters
-	redisKey := fmt.Sprintf("%s:%d:%d", constant.PACKAGE_REDIS, req.PageSize, req.Page)
+	var redisKey string
+	if req.Keyword == "" {
+		redisKey = fmt.Sprintf("%s:%d:%d", constant.PACKAGE_REDIS, req.PageSize, req.Page)
+	} else {
+		redisKey = fmt.Sprintf("%s:%d:%d:%s", constant.PACKAGE_REDIS, req.PageSize, req.Page, req.Keyword)
+	}
 
 	// Get data from cache
 	cachedResponse, err := server.cache.Get(ctx, redisKey)
 	if err == nil {
 		// If the response is found in the cache, deserialize it and return
-		var packages []*pb.Package
-		err = json.Unmarshal([]byte(cachedResponse), &packages)
+		var res *pb.GetPackagesResponse
+		err = json.Unmarshal([]byte(cachedResponse), &res)
 		if err != nil {
 			return nil, err
 		}
-		return &pb.GetPackagesResponse{
-			Packages: packages,
-		}, nil
+		return res, nil
 	}
 
 	// If not found in cache, get from db
 	var packages []*model.Package
 
-	if err := server.store.Limit(int(req.PageSize)).Offset(int(req.PageSize) * (int(req.Page) - 1)).Find(&packages).Error; err != nil {
+	if err := server.store.
+		Preload("Types").
+		Limit(int(req.PageSize)).
+		Offset(int(req.PageSize)*(int(req.Page)-1)).
+		Where("LOWER(name) LIKE ?", "%"+strings.ToLower(req.Keyword)+"%").
+		Find(&packages).Error; err != nil {
 		return nil, err
 	}
 
@@ -65,19 +126,31 @@ func (server *PackageServer) GetPackages(ctx context.Context, req *pb.Pagination
 
 	convertedPackages := convertPackages(makePackages)
 
+	var total int64
+	if err := server.store.Model(&model.Package{}).Where("LOWER(name) LIKE ?", "%"+strings.ToLower(req.Keyword)+"%").Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	res := &pb.GetPackagesResponse{
+		Packages: convertedPackages,
+		Pagination: &pb.PaginationRes{
+			Total:    total,
+			Page:     req.Page,
+			PageSize: req.PageSize,
+		},
+	}
+
 	// Serialize the response and store it in Redis cache for future use
-	serializedResponse, err := json.Marshal(convertedPackages)
+	serializedResponse, err := json.Marshal(res)
 	if err != nil {
 		return nil, err
 	}
-	err = server.cache.Set(ctx, redisKey, serializedResponse, 0)
+	err = server.cache.Set(ctx, redisKey, serializedResponse, time.Hour)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.GetPackagesResponse{
-		Packages: convertedPackages,
-	}, nil
+	return res, nil
 }
 
 func (server *PackageServer) GetPackage(ctx context.Context, req *pb.PackageID) (*pb.Package, error) {
@@ -98,12 +171,12 @@ func (server *PackageServer) GetPackage(ctx context.Context, req *pb.PackageID) 
 	// If not found in cache, get from db
 	var packageModel model.Package
 
-	if err := server.store.First(&packageModel, req.Id).Error; err != nil {
+	if err := server.store.Preload("Types").First(&packageModel, req.Id).Error; err != nil {
 		return nil, err
 	}
 
 	// Serialize the response and store it in Redis cache for future use
-	serializedResponse, err := json.Marshal(packageModel)
+	serializedResponse, err := json.Marshal(convertPackage(packageModel))
 	if err != nil {
 		log.Println(err)
 	}

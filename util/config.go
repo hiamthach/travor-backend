@@ -15,6 +15,7 @@ type Config struct {
 	RedisUsername          string        `mapstructure:"REDIS_USERNAME" env:"REDIS_USERNAME"`
 	ServerAddress          string        `mapstructure:"SERVER_ADDRESS" env:"SERVER_ADDRESS"`
 	GRPCServerAddress      string        `mapstructure:"GRPC_SERVER_ADDRESS" env:"GRPC_SERVER_ADDRESS"`
+	GRPCClientAddress      string        `mapstructure:"GRPC_CLIENT_ADDRESS" env:"GRPC_CLIENT_ADDRESS"`
 	TokenSymmetricKey      string        `mapstructure:"TOKEN_SYMMETRIC_KEY" env:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration    time.Duration `mapstructure:"ACCESS_TOKEN_DURATION" env:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenPublicKey   string        `mapstructure:"ACCESS_TOKEN_PUBLIC_KEY" env:"ACCESS_TOKEN_PUBLIC_KEY"`

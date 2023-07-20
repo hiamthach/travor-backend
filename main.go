@@ -6,6 +6,7 @@ import (
 	"github.com/travor-backend/db"
 	"github.com/travor-backend/gapi"
 	"github.com/travor-backend/util"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -24,7 +25,14 @@ func main() {
 		log.Fatal("Can not connect to redis: ", err)
 	}
 
+	conn, err := grpc.Dial(config.GRPCServerAddress, grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("can not connect to grpc server: %w", err)
+	}
+
+	defer conn.Close()
+
 	// Run gRPC Server
-	go gapi.RunGRPCServer(config, db.DB, *redisUtil)
-	gapi.RunGatewayServer(config, db.DB, *redisUtil)
+	go gapi.RunGRPCServer(config, db.DB, *redisUtil, conn)
+	gapi.RunGatewayServer(config, db.DB, *redisUtil, conn)
 }

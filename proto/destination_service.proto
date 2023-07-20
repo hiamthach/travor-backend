@@ -3,10 +3,19 @@ syntax = "proto3";
 package pb;
 
 import "google/api/annotations.proto";
+import "pagination.proto";
 
 option go_package = "github.com/travor-backend/pb";
 
 service DestinationService {
+  rpc isValid(ValidRequest) returns (DestinationValid) {}
+
+  rpc GetAll(GetAllRequest) returns (GetAllResponse) {
+    option (google.api.http) = {
+      get: "/stats/destinations"
+    };
+  }
+
   rpc GetDestinations(GetDestinationsRequest) returns (GetDestinationsResponse) {
     option (google.api.http) = {
       get: "/destinations"
@@ -53,9 +62,33 @@ message Destination {
   string location = 10;
 }
 
+message DestinationStats {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message ValidRequest {
+  uint64 id = 1;
+}
+
+message GetAllRequest {}
+
+message GetAllResponse {
+  repeated DestinationStats destinations = 1;
+}
+
+message DestinationValid {
+  bool valid = 1;
+}
+
+message DestinationFilter {
+  string keyword = 1;
+}
+
 message GetDestinationsRequest {
   uint32 page = 1;
   uint32 page_size = 2;
+  string keyword = 3;
 }
 
 message GetDestinationByIdRequest {
@@ -64,6 +97,7 @@ message GetDestinationByIdRequest {
 
 message GetDestinationsResponse {
   repeated Destination destinations = 1;
+  PaginationRes pagination = 2;
 }
 
 message CreateDestinationRequest {

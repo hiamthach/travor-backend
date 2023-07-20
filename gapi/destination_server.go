@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/travor-backend/constant"
@@ -32,33 +33,93 @@ func NewDestinationServer(config util.Config, cache util.RedisUtil) (*Destinatio
 	return &DestinationServer{store: desDb, config: config, cache: cache}, nil
 }
 
+func (server *DestinationServer) GetAll(ctx context.Context, req *pb.GetAllRequest) (*pb.GetAllResponse, error) {
+	// Get from redis
+	redisKey := fmt.Sprintf("%s:all", constant.DESTINATION_REDIS)
+
+	cachedResponse, err := server.cache.Get(ctx, redisKey)
+	if err == nil {
+		// If the response is found in the cache, deserialize it and return
+		var response *pb.GetAllResponse
+		err = json.Unmarshal([]byte(cachedResponse), &response)
+		if err != nil {
+			return nil, err
+		}
+		return response, err
+	}
+
+	var destinations []*pb.DestinationStats
+
+	if err := server.store.Table("destinations").Select("id", "name").Find(&destinations).Error; err != nil {
+		return nil, err
+	}
+
+	res := &pb.GetAllResponse{
+		Destinations: destinations,
+	}
+
+	// Serialize the response and store it in Redis cache for future use
+	serializedResponse, err := json.Marshal(res)
+	if err != nil {
+		log.Print(err)
+	}
+
+	if err = server.cache.Set(ctx, redisKey, serializedResponse, time.Hour); err != nil {
+		log.Print(err)
+	}
+
+	return res, nil
+}
+
 func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.GetDestinationsRequest) (*pb.GetDestinationsResponse, error) {
 	// Create a Redis key based on the request parameters
-	redisKey := fmt.Sprintf("%s:%d:%d", constant.DESTINATION_REDIS, req.PageSize, req.Page)
+	var redisKey string
+	if req.Keyword == "" {
+		redisKey = fmt.Sprintf("%s:%d:%d", constant.DESTINATION_REDIS, req.PageSize, req.Page)
+	} else {
+		redisKey = fmt.Sprintf("%s:%d:%d:%s", constant.DESTINATION_REDIS, req.PageSize, req.Page, req.Keyword)
+	}
 
 	// Get data from cache
 	cachedResponse, err := server.cache.Get(ctx, redisKey)
 	if err == nil {
 		// If the response is found in the cache, deserialize it and return
-		var destinations []*pb.Destination
-		err = json.Unmarshal([]byte(cachedResponse), &destinations)
+		var response *pb.GetDestinationsResponse
+		err = json.Unmarshal([]byte(cachedResponse), &response)
 		if err != nil {
 			return nil, err
 		}
-		return &pb.GetDestinationsResponse{
-			Destinations: destinations,
-		}, nil
+		return response, err
 	}
 
 	// If not found in cache, get from db
 	var destinations []*pb.Destination
 
-	if err := server.store.Limit(int(req.PageSize)).Offset(int(req.PageSize) * (int(req.Page) - 1)).Find(&destinations).Error; err != nil {
+	// If keyword is empty, get all destinations, else get destinations by keyword ignore case
+	if err := server.store.
+		Limit(int(req.PageSize)).
+		Offset(int(req.PageSize)*(int(req.Page)-1)).
+		Where("LOWER(name) LIKE ?", "%"+strings.ToLower(req.Keyword)+"%").
+		Find(&destinations).Error; err != nil {
 		return nil, err
 	}
 
+	var total int64
+	if err := server.store.Model(&pb.Destination{}).Where("LOWER(name) LIKE ?", "%"+strings.ToLower(req.Keyword)+"%").Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	res := &pb.GetDestinationsResponse{
+		Destinations: destinations,
+		Pagination: &pb.PaginationRes{
+			PageSize: req.PageSize,
+			Page:     req.Page,
+			Total:    total,
+		},
+	}
+
 	// Serialize the response and store it in Redis cache for future use
-	serializedResponse, err := json.Marshal(destinations)
+	serializedResponse, err := json.Marshal(res)
 	if err != nil {
 		log.Print(err)
 	}
@@ -67,9 +128,7 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 		log.Print(err)
 	}
 
-	return &pb.GetDestinationsResponse{
-		Destinations: destinations,
-	}, nil
+	return res, nil
 }
 
 func (server *DestinationServer) GetDestinationById(ctx context.Context, req *pb.GetDestinationByIdRequest) (*pb.Destination, error) {
@@ -89,7 +148,7 @@ func (server *DestinationServer) GetDestinationById(ctx context.Context, req *pb
 	}
 
 	// If not found in cache, get from db
-	var destination pb.Destination
+	var destination *pb.Destination
 
 	if err := server.store.First(&destination, req.Id).Error; err != nil {
 		return nil, err
@@ -105,7 +164,7 @@ func (server *DestinationServer) GetDestinationById(ctx context.Context, req *pb
 		log.Print(err)
 	}
 
-	return &destination, nil
+	return destination, nil
 }
 
 func (server *DestinationServer) CreateDestination(ctx context.Context, req *pb.CreateDestinationRequest) (*pb.CreateDestinationResponse, error) {

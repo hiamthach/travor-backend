@@ -15,7 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
+// RunGRPCServer runs the grpc server
+func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil, conn *grpc.ClientConn) {
 	grpcServer := grpc.NewServer()
 
 	// Register auth server
@@ -58,6 +59,13 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 
 	pb.RegisterGalleryServiceServer(grpcServer, galleryServer)
 
+	// Register trip server
+	tripServer, err := NewTripServer(config, cache, conn)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+	pb.RegisterTripServiceServer(grpcServer, tripServer)
+
 	// Start server
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
@@ -71,7 +79,8 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
 	}
 }
 
-func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) {
+// RunGatewayServer runs the grpc gateway server
+func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil, conn *grpc.ClientConn) {
 	// initialize grpc server
 	authServer, err := NewAuthServer(config)
 	if err != nil {
@@ -93,6 +102,11 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 	}
 
 	galleryServer, err := NewGalleryServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	tripServer, err := NewTripServer(config, cache, conn)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
@@ -130,6 +144,10 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil) 
 	}
 
 	if err = pb.RegisterGalleryServiceHandlerServer(ctx, grpcMux, galleryServer); err != nil {
+		log.Fatal("Can not register gateway server: ", err)
+	}
+
+	if err = pb.RegisterTripServiceHandlerServer(ctx, grpcMux, tripServer); err != nil {
 		log.Fatal("Can not register gateway server: ", err)
 	}
 

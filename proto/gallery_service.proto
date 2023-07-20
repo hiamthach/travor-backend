@@ -14,6 +14,13 @@ service GalleryService {
     };
   }
 
+  rpc AddListImages(AddListImagesRequest) returns (AddListImagesResponse) {
+    option (google.api.http) = {
+      post: "/galleries/list"
+      body: "*"
+    };
+  }
+
   rpc GetImages(GetImagesRequest) returns (GetImagesResponse) {
     option (google.api.http) = {
       get: "/galleries/{desId}"
@@ -30,20 +37,29 @@ service GalleryService {
 message Image {
   int64 id = 1;
   string url = 2;
-  int32  desId = 3;
+  uint64  desId = 3;
 }
 
 message AddImageRequest {
   string url = 1;
-  int32  desId = 2;
+  uint64  desId = 2;
 }
 
 message AddImageResponse {
   Image image = 1;
 }
 
+message AddListImagesRequest {
+  repeated string urls = 1;
+  uint64  desId = 2;
+}
+
+message AddListImagesResponse {
+  repeated Image images = 1;
+}
+
 message GetImagesRequest {
-  int32 desId = 1;
+  uint64 desId = 1;
 }
 
 message GetImagesResponse {

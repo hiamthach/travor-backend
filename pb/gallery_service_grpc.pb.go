@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	GalleryService_AddImage_FullMethodName    = "/pb.GalleryService/AddImage"
-	GalleryService_GetImages_FullMethodName   = "/pb.GalleryService/GetImages"
-	GalleryService_DeleteImage_FullMethodName = "/pb.GalleryService/DeleteImage"
+	GalleryService_AddImage_FullMethodName      = "/pb.GalleryService/AddImage"
+	GalleryService_AddListImages_FullMethodName = "/pb.GalleryService/AddListImages"
+	GalleryService_GetImages_FullMethodName     = "/pb.GalleryService/GetImages"
+	GalleryService_DeleteImage_FullMethodName   = "/pb.GalleryService/DeleteImage"
 )
 
 // GalleryServiceClient is the client API for GalleryService service.
@@ -29,6 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GalleryServiceClient interface {
 	AddImage(ctx context.Context, in *AddImageRequest, opts ...grpc.CallOption) (*AddImageResponse, error)
+	AddListImages(ctx context.Context, in *AddListImagesRequest, opts ...grpc.CallOption) (*AddListImagesResponse, error)
 	GetImages(ctx context.Context, in *GetImagesRequest, opts ...grpc.CallOption) (*GetImagesResponse, error)
 	DeleteImage(ctx context.Context, in *DeleteImageRequest, opts ...grpc.CallOption) (*DeleteImageResponse, error)
 }
@@ -44,6 +46,15 @@ func NewGalleryServiceClient(cc grpc.ClientConnInterface) GalleryServiceClient {
 func (c *galleryServiceClient) AddImage(ctx context.Context, in *AddImageRequest, opts ...grpc.CallOption) (*AddImageResponse, error) {
 	out := new(AddImageResponse)
 	err := c.cc.Invoke(ctx, GalleryService_AddImage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *galleryServiceClient) AddListImages(ctx context.Context, in *AddListImagesRequest, opts ...grpc.CallOption) (*AddListImagesResponse, error) {
+	out := new(AddListImagesResponse)
+	err := c.cc.Invoke(ctx, GalleryService_AddListImages_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +84,7 @@ func (c *galleryServiceClient) DeleteImage(ctx context.Context, in *DeleteImageR
 // for forward compatibility
 type GalleryServiceServer interface {
 	AddImage(context.Context, *AddImageRequest) (*AddImageResponse, error)
+	AddListImages(context.Context, *AddListImagesRequest) (*AddListImagesResponse, error)
 	GetImages(context.Context, *GetImagesRequest) (*GetImagesResponse, error)
 	DeleteImage(context.Context, *DeleteImageRequest) (*DeleteImageResponse, error)
 	mustEmbedUnimplementedGalleryServiceServer()
@@ -84,6 +96,9 @@ type UnimplementedGalleryServiceServer struct {
 
 func (UnimplementedGalleryServiceServer) AddImage(context.Context, *AddImageRequest) (*AddImageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddImage not implemented")
+}
+func (UnimplementedGalleryServiceServer) AddListImages(context.Context, *AddListImagesRequest) (*AddListImagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddListImages not implemented")
 }
 func (UnimplementedGalleryServiceServer) GetImages(context.Context, *GetImagesRequest) (*GetImagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetImages not implemented")
@@ -118,6 +133,24 @@ func _GalleryService_AddImage_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GalleryServiceServer).AddImage(ctx, req.(*AddImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GalleryService_AddListImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddListImagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GalleryServiceServer).AddListImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GalleryService_AddListImages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GalleryServiceServer).AddListImages(ctx, req.(*AddListImagesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -168,6 +201,10 @@ var GalleryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddImage",
 			Handler:    _GalleryService_AddImage_Handler,
+		},
+		{
+			MethodName: "AddListImages",
+			Handler:    _GalleryService_AddListImages_Handler,
 		},
 		{
 			MethodName: "GetImages",

@@ -64,6 +64,41 @@ func (server *GalleryServer) AddImage(ctx context.Context, req *pb.AddImageReque
 	}, nil
 }
 
+func (server *GalleryServer) AddListImages(ctx context.Context, req *pb.AddListImagesRequest) (*pb.AddListImagesResponse, error) {
+	// Add admin interceptor
+	c, err := interceptor.AdminInterceptor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := c.Value(constant.AUTHORIZATION_PAYLOAD_KEY).(*util.Payload)
+	if payload == nil {
+		return nil, errors.New("unauthorized")
+	}
+
+	var images []*pb.Image
+	for _, url := range req.Urls {
+		images = append(images, &pb.Image{
+			DesId: req.DesId,
+			Url:   url,
+		})
+	}
+
+	if err := server.store.Table("galleries").Create(&images).Error; err != nil {
+		return nil, err
+	}
+
+	// Clear cache
+	redisKey := fmt.Sprintf("%s:%d", constant.GALLERY_REDIS, req.DesId)
+	if err := server.cache.Clear(ctx, redisKey); err != nil {
+		log.Println(err)
+	}
+
+	return &pb.AddListImagesResponse{
+		Images: images,
+	}, nil
+}
+
 func (server *GalleryServer) GetImages(ctx context.Context, req *pb.GetImagesRequest) (*pb.GetImagesResponse, error) {
 	redisKey := fmt.Sprintf("%s:%d", constant.GALLERY_REDIS, req.DesId)
 
