@@ -105,7 +105,7 @@ func (server *DestinationServer) GetDestinations(ctx context.Context, req *pb.Ge
 	}
 
 	var total int64
-	if err := server.store.Model(&pb.Destination{}).Count(&total).Error; err != nil {
+	if err := server.store.Model(&pb.Destination{}).Where("LOWER(name) LIKE ?", "%"+strings.ToLower(req.Keyword)+"%").Count(&total).Error; err != nil {
 		return nil, err
 	}
 

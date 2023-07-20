@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	PackageService_IsValidPackage_FullMethodName = "/pb.PackageService/IsValidPackage"
+	PackageService_GetAll_FullMethodName         = "/pb.PackageService/GetAll"
 	PackageService_GetPackages_FullMethodName    = "/pb.PackageService/GetPackages"
 	PackageService_GetPackage_FullMethodName     = "/pb.PackageService/GetPackage"
 	PackageService_CreatePackage_FullMethodName  = "/pb.PackageService/CreatePackage"
@@ -32,7 +33,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PackageServiceClient interface {
 	IsValidPackage(ctx context.Context, in *PackageID, opts ...grpc.CallOption) (*IsValidPackageResponse, error)
-	GetPackages(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*GetPackagesResponse, error)
+	GetAll(ctx context.Context, in *GetPkgStatsRequest, opts ...grpc.CallOption) (*GetPkgStatsResponse, error)
+	GetPackages(ctx context.Context, in *GetPackagesRequest, opts ...grpc.CallOption) (*GetPackagesResponse, error)
 	GetPackage(ctx context.Context, in *PackageID, opts ...grpc.CallOption) (*Package, error)
 	CreatePackage(ctx context.Context, in *CreatePackageReq, opts ...grpc.CallOption) (*Package, error)
 	UpdatePackage(ctx context.Context, in *UpdatePackageReq, opts ...grpc.CallOption) (*Package, error)
@@ -56,7 +58,16 @@ func (c *packageServiceClient) IsValidPackage(ctx context.Context, in *PackageID
 	return out, nil
 }
 
-func (c *packageServiceClient) GetPackages(ctx context.Context, in *Pagination, opts ...grpc.CallOption) (*GetPackagesResponse, error) {
+func (c *packageServiceClient) GetAll(ctx context.Context, in *GetPkgStatsRequest, opts ...grpc.CallOption) (*GetPkgStatsResponse, error) {
+	out := new(GetPkgStatsResponse)
+	err := c.cc.Invoke(ctx, PackageService_GetAll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *packageServiceClient) GetPackages(ctx context.Context, in *GetPackagesRequest, opts ...grpc.CallOption) (*GetPackagesResponse, error) {
 	out := new(GetPackagesResponse)
 	err := c.cc.Invoke(ctx, PackageService_GetPackages_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -106,7 +117,8 @@ func (c *packageServiceClient) DeletePackage(ctx context.Context, in *PackageID,
 // for forward compatibility
 type PackageServiceServer interface {
 	IsValidPackage(context.Context, *PackageID) (*IsValidPackageResponse, error)
-	GetPackages(context.Context, *Pagination) (*GetPackagesResponse, error)
+	GetAll(context.Context, *GetPkgStatsRequest) (*GetPkgStatsResponse, error)
+	GetPackages(context.Context, *GetPackagesRequest) (*GetPackagesResponse, error)
 	GetPackage(context.Context, *PackageID) (*Package, error)
 	CreatePackage(context.Context, *CreatePackageReq) (*Package, error)
 	UpdatePackage(context.Context, *UpdatePackageReq) (*Package, error)
@@ -121,7 +133,10 @@ type UnimplementedPackageServiceServer struct {
 func (UnimplementedPackageServiceServer) IsValidPackage(context.Context, *PackageID) (*IsValidPackageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsValidPackage not implemented")
 }
-func (UnimplementedPackageServiceServer) GetPackages(context.Context, *Pagination) (*GetPackagesResponse, error) {
+func (UnimplementedPackageServiceServer) GetAll(context.Context, *GetPkgStatsRequest) (*GetPkgStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedPackageServiceServer) GetPackages(context.Context, *GetPackagesRequest) (*GetPackagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPackages not implemented")
 }
 func (UnimplementedPackageServiceServer) GetPackage(context.Context, *PackageID) (*Package, error) {
@@ -167,8 +182,26 @@ func _PackageService_IsValidPackage_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PackageService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPkgStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PackageServiceServer).GetAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PackageService_GetAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PackageServiceServer).GetAll(ctx, req.(*GetPkgStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _PackageService_GetPackages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Pagination)
+	in := new(GetPackagesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -180,7 +213,7 @@ func _PackageService_GetPackages_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: PackageService_GetPackages_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PackageServiceServer).GetPackages(ctx, req.(*Pagination))
+		return srv.(PackageServiceServer).GetPackages(ctx, req.(*GetPackagesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -267,6 +300,10 @@ var PackageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IsValidPackage",
 			Handler:    _PackageService_IsValidPackage_Handler,
+		},
+		{
+			MethodName: "GetAll",
+			Handler:    _PackageService_GetAll_Handler,
 		},
 		{
 			MethodName: "GetPackages",

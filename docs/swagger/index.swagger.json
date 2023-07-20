@@ -547,6 +547,12 @@
             "required": false,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -733,6 +739,28 @@
         },
         "tags": [
           "DestinationService"
+        ]
+      }
+    },
+    "/stats/packages": {
+      "get": {
+        "operationId": "PackageService_GetAll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetPkgStatsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "PackageService"
         ]
       }
     },
@@ -1330,6 +1358,18 @@
         }
       }
     },
+    "pbGetPkgStatsResponse": {
+      "type": "object",
+      "properties": {
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbPackageStats"
+          }
+        }
+      }
+    },
     "pbGetTripsResponse": {
       "type": "object",
       "properties": {
@@ -1451,6 +1491,18 @@
             "type": "object",
             "$ref": "#/definitions/pbType"
           }
+        }
+      }
+    },
+    "pbPackageStats": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
         }
       }
     },
