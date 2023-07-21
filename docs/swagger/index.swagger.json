@@ -22,6 +22,9 @@
     },
     {
       "name": "TypeService"
+    },
+    {
+      "name": "UserService"
     }
   ],
   "consumes": [
@@ -764,6 +767,28 @@
         ]
       }
     },
+    "/stats/users": {
+      "get": {
+        "operationId": "UserService_GetUserStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetUserStatsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
     "/trips": {
       "get": {
         "operationId": "TripService_GetTrips",
@@ -1004,6 +1029,80 @@
         ],
         "tags": [
           "TypeService"
+        ]
+      }
+    },
+    "/users/{username}": {
+      "get": {
+        "operationId": "UserService_GetUserInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetUserInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "put": {
+        "operationId": "UserService_UpdateUserInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fullName": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
         ]
       }
     }
@@ -1394,6 +1493,26 @@
         }
       }
     },
+    "pbGetUserInfoResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
+        }
+      }
+    },
+    "pbGetUserStatsResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbUserStats"
+          }
+        }
+      }
+    },
     "pbImage": {
       "type": "object",
       "properties": {
@@ -1590,6 +1709,14 @@
         }
       }
     },
+    "pbUpdateUserInfoResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
     "pbUser": {
       "type": "object",
       "properties": {
@@ -1615,6 +1742,24 @@
         },
         "status": {
           "type": "boolean"
+        }
+      }
+    },
+    "pbUserStats": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "role": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

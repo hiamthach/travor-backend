@@ -69,6 +69,10 @@ func (server *PackageServer) GetAll(ctx context.Context, req *pb.GetPkgStatsRequ
 		return nil, err
 	}
 
+	if packages == nil {
+		packages = []*pb.PackageStats{}
+	}
+
 	res := &pb.GetPkgStatsResponse{
 		Packages: packages,
 	}

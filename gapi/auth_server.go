@@ -2,6 +2,8 @@ package gapi
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"github.com/travor-backend/constant"
 	"github.com/travor-backend/db"
@@ -15,18 +17,19 @@ import (
 )
 
 type AuthServer struct {
+	cache  util.RedisUtil
 	config util.Config
 	store  *gorm.DB
 	pb.UnimplementedAuthServiceServer
 }
 
-func NewAuthServer(config util.Config) (*AuthServer, error) {
+func NewAuthServer(config util.Config, cache util.RedisUtil) (*AuthServer, error) {
 	userdb, err := db.Connect(config.GetDBSource(constant.USER_DB))
 	if err != nil {
 		return nil, err
 	}
 
-	return &AuthServer{store: userdb, config: config}, nil
+	return &AuthServer{store: userdb, config: config, cache: cache}, nil
 }
 
 func (server *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
@@ -95,6 +98,12 @@ func (server *AuthServer) CreateUser(ctx context.Context, req *pb.CreateUserRequ
 
 	if err := server.store.Create(&user).Error; err != nil {
 		return nil, err
+	}
+
+	// Delete all user info in redis
+	redisKey := fmt.Sprintf("%s:all", constant.USER_REDIS)
+	if err := server.cache.Clear(ctx, redisKey); err != nil {
+		log.Print(err)
 	}
 
 	return convertUser(user), nil
