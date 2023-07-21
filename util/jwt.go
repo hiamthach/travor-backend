@@ -18,7 +18,7 @@ var (
 type Payload struct {
 	ID        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`
-	RoleID    int       `json:"role_id"`
+	RoleID    int32     `json:"role_id"`
 	IssueAt   time.Time `json:"issue_at"`
 	ExpiredAt time.Time `json:"expired_at"`
 }
@@ -108,6 +108,7 @@ func VerifyToken(token string, publicKey string) (*Payload, error) {
 	return &Payload{
 		ID:        uuid.MustParse(payload["token_uuid"].(string)),
 		Username:  payload["sub"].(string),
+		RoleID:    int32(payload["role_id"].(float64)),
 		IssueAt:   time.Unix(int64(payload["iat"].(float64)), 0),
 		ExpiredAt: time.Unix(int64(payload["exp"].(float64)), 0),
 	}, nil
