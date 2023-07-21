@@ -1742,6 +1742,10 @@
         },
         "status": {
           "type": "boolean"
+        },
+        "role": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

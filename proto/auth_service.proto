@@ -51,6 +51,7 @@ message User {
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp password_changed_at = 6;
   bool status = 7;
+  int32 role = 8;
 }
 
 message LoginRequest {
