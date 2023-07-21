@@ -11,6 +11,7 @@ func convertUser(user model.User) *pb.User {
 		Username:          user.Username,
 		FullName:          user.FullName,
 		Email:             user.Email,
+		Phone:             user.Phone,
 		PasswordChangedAt: timestamppb.New(user.PasswordChangedAt),
 		CreatedAt:         timestamppb.New(user.CreatedAt),
 	}

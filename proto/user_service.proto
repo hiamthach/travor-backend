@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/api/annotations.proto";
+import "auth_service.proto";
+
+option go_package = "github.com/travor-backend/pb";
+
+service UserService {
+  rpc GetUserStats (GetUserStatsRequest) returns (GetUserStatsResponse) {
+    option (google.api.http) = {
+      get: "/stats/users"
+    };
+  }
+
+  rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {
+    option (google.api.http) = {
+      get: "/users/{username}"
+    };
+  }
+
+  rpc UpdateUserInfo(UpdateUserInfoRequest) returns (UpdateUserInfoResponse) {
+    option (google.api.http) = {
+      put: "/users/{username}"
+      body: "*"
+    };
+  }
+}
+
+message UserStats {
+  string username = 1;
+  string email = 2;
+  string full_name = 3;
+  int32 role = 4;
+}
+
+message GetUserStatsRequest {
+}
+
+message GetUserStatsResponse {
+  repeated UserStats users = 1;
+}
+
+message GetUserInfoRequest {
+  string username = 1;
+}
+
+message GetUserInfoResponse {
+  User user = 1;
+}
+
+message UpdateUserInfoRequest {
+  string username = 1;
+  string full_name = 2;
+  string phone = 3;
+}
+
+message UpdateUserInfoResponse {
+  bool success = 1;
+}
+

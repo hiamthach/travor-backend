@@ -20,7 +20,7 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil, con
 	grpcServer := grpc.NewServer()
 
 	// Register auth server
-	authServer, err := NewAuthServer(config)
+	authServer, err := NewAuthServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
@@ -66,6 +66,13 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil, con
 	}
 	pb.RegisterTripServiceServer(grpcServer, tripServer)
 
+	// Register user server
+	userServer, err := NewUserServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+	pb.RegisterUserServiceServer(grpcServer, userServer)
+
 	// Start server
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
@@ -82,10 +89,11 @@ func RunGRPCServer(config util.Config, store *gorm.DB, cache util.RedisUtil, con
 // RunGatewayServer runs the grpc gateway server
 func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil, conn *grpc.ClientConn) {
 	// initialize grpc server
-	authServer, err := NewAuthServer(config)
+	authServer, err := NewAuthServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
 	}
+
 	destinationServer, err := NewDestinationServer(config, cache)
 	if err != nil {
 		log.Fatal("Can not create server: ", err)
@@ -111,6 +119,12 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil, 
 		log.Fatal("Can not create server: ", err)
 	}
 
+	userServer, err := NewUserServer(config, cache)
+	if err != nil {
+		log.Fatal("Can not create server: ", err)
+	}
+
+	// initialize json option
 	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
 			UseProtoNames: true,
@@ -148,6 +162,10 @@ func RunGatewayServer(config util.Config, store *gorm.DB, cache util.RedisUtil, 
 	}
 
 	if err = pb.RegisterTripServiceHandlerServer(ctx, grpcMux, tripServer); err != nil {
+		log.Fatal("Can not register gateway server: ", err)
+	}
+
+	if err = pb.RegisterUserServiceHandlerServer(ctx, grpcMux, userServer); err != nil {
 		log.Fatal("Can not register gateway server: ", err)
 	}
 

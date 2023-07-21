@@ -7,6 +7,7 @@ const (
 	GALLERY_DB     = "gallerydb"
 	TRIP_DB        = "tripdb"
 	// redis key
+	USER_REDIS        = "users"
 	DESTINATION_REDIS = "destinations"
 	TYPE_REDIS        = "types"
 	PACKAGE_REDIS     = "packages"
