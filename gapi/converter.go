@@ -14,6 +14,7 @@ func convertUser(user model.User) *pb.User {
 		Phone:             user.Phone,
 		PasswordChangedAt: timestamppb.New(user.PasswordChangedAt),
 		CreatedAt:         timestamppb.New(user.CreatedAt),
+		Role:              int32(user.Role),
 	}
 }
 

@@ -5,6 +5,6 @@ const (
 	AUTHORIZATION_TYPE_BEARER = "bearer"
 	AUTHORIZATION_PAYLOAD_KEY = "authorization_payload"
 	AUTHORIZATION_ROLE        = "authorization_role"
-	ADMIN_ROLE                = 0
+	ADMIN_ROLE                = 1000
 	USER_ROLE                 = 1
 )
